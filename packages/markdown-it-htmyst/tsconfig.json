@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    // module is overridden from the build:esm/build:cjs scripts
+    "module": "es2015",
+    "jsx": "react-jsx",
+    "lib": ["es2020"],
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "moduleResolution": "node",
+    "sourceMap": false,
+    // outDir is overridden from the build:esm/build:cjs scripts
+    "outDir": "dist/types",
+    "baseUrl": "src",
+    "paths": {
+      "*": ["node_modules/*"]
+    },
+    // Type roots allows it to be included in a workspace
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types",
+      "../../node_modules/@types",
+      "../../../node_modules/@types"
+    ],
+    "resolveJsonModule": true,
+    // Ignore node_modules, etc.
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["tests/**/*"]
+}
