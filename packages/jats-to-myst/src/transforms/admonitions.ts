@@ -9,6 +9,13 @@ import type { VFile } from 'vfile';
 
 export type Section = Omit<Heading, 'type'> & { type: 'section' };
 
+/**
+ * Convert boxed-text caption to admonitionTitle (with content from caption > title)
+ *
+ * If boxed-text caption does not have a title, warn.
+ *
+ * After converting, delete any remaining boxed-text captions.
+ */
 export function admonitionTransform(tree: GenericParent, file: VFile) {
   const captions = selectAll(`${Tags.boxedText} > ${Tags.caption}`, tree) as GenericParent[];
   captions.forEach((caption) => {

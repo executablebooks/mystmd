@@ -19,6 +19,14 @@ function recurseSections(tree: GenericNode, depth = 1): void {
   });
 }
 
+/**
+ * Clean up nested sections
+ *
+ * - Identify sections with titles
+ * - Convert those titles to headings
+ * - Give headings depth value based on nesting
+ * - Flatten the sections
+ */
 export function sectionTransform(tree: GenericParent) {
   recurseSections(tree);
   const topSections = tree.children?.filter((n) => n.type === 'sec');

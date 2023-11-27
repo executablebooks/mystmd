@@ -10,6 +10,8 @@ import { u } from 'unist-builder';
 import { RefType } from 'jats-tags';
 import { Jats } from 'jats-xml';
 import { keysTransform } from 'myst-transforms';
+import { MathMLToLaTeX } from 'mathml-to-latex';
+import { js2xml } from 'xml-js';
 import type { Handler, IJatsParser, JatsResult, Options, StateData } from './types.js';
 import { basicTransformations } from './transforms/index.js';
 
@@ -26,6 +28,38 @@ function refTypeToReferenceKind(kind?: RefType): string | undefined {
     case RefType.custom:
       return undefined;
   }
+}
+
+function texMathFromNode(node: GenericNode) {
+  const texMath = select('tex-math', node) as GenericNode;
+  if (texMath && texMath.children?.[0].cdata) {
+    return texMath.children?.[0].cdata;
+  }
+  selectAll('*', node).forEach((n: any) => {
+    if (n.type.startsWith('mml:')) {
+      n.type = n.type.substring(4);
+    }
+  });
+  const math = select('math', node) as GenericNode;
+  if (!math) return;
+  [math, ...selectAll('math *', node)].forEach((n: any) => {
+    const { type, value, children, ...attributes } = n;
+    if (type === 'text') {
+      n.type = 'text';
+      n.text = value;
+      delete n.value;
+    } else {
+      n.type = 'element';
+      n.name = type;
+      n.elements = children;
+      n.attributes = attributes;
+      delete n.children;
+      Object.keys(attributes).forEach((k) => {
+        delete n[k];
+      });
+    }
+  });
+  return MathMLToLaTeX.convert(js2xml({ type: 'element', name: 'root', elements: [math] }));
 }
 
 type Attributes = Record<string, any>;
@@ -83,26 +117,30 @@ const handlers: Record<string, Handler> = {
   //   // The use of thematic breaks should be restricted to use inside table cells.
   //   // https://jats.nlm.nih.gov/archiving/tag-library/1.3/element/hr.html
   // },
-  // ['inline-formula'](node, state) {
-  //   // state.openNode('inline-formula');
-  //   // state.openNode('tex-math');
-  //   // state.addLeaf('cdata', { cdata: node.value });
-  //   // state.closeNode();
-  //   // state.closeNode();
-  // },
-  // ['disp-formula'](node, state) {
-  //   const { identifier, enumerated, enumerator } = node;
-  //   state.openNode('disp-formula', { id: identifier });
-  //   if (enumerated !== false && enumerator) {
-  //     state.openNode('label');
-  //     state.text(`(${enumerator})`);
-  //     state.closeNode();
-  //   }
-  //   state.openNode('tex-math');
-  //   state.addLeaf('cdata', { cdata: node.value });
-  //   state.closeNode();
-  //   state.closeNode();
-  // },
+  ['inline-formula'](node, state) {
+    const texMath = texMathFromNode(node);
+    if (texMath) {
+      state.addLeaf('inlineMath', {
+        value: texMath,
+        label: node.id,
+        identifier: node.id,
+      });
+    } else {
+      state.renderChildren(node);
+    }
+  },
+  ['disp-formula'](node, state) {
+    const texMath = texMathFromNode(node);
+    if (texMath) {
+      state.addLeaf('math', {
+        value: texMath,
+        label: node.id,
+        identifier: node.id,
+      });
+    } else {
+      state.renderChildren(node);
+    }
+  },
   // mystRole(node, state) {
   //   state.renderChildren(node);
   // },
@@ -159,29 +197,6 @@ const handlers: Record<string, Handler> = {
   //   // This is used inside of disp-quotes
   //   state.renderInline(node, 'attrib');
   // },
-  // table(node, state) {
-  //   state.renderInline(node, 'table');
-  // },
-  // tableHead(node, state) {
-  //   state.renderInline(node, 'thead');
-  // },
-  // tableBody(node, state) {
-  //   state.renderInline(node, 'tbody');
-  // },
-  // tableFooter(node, state) {
-  //   state.renderInline(node, 'tfoot');
-  // },
-  // tableRow(node, state) {
-  //   state.renderInline(node, 'tr');
-  // },
-  // tableCell(node, state) {
-  //   const { align, colspan, rowspan } = node as TableCell;
-  //   state.renderInline(node, node.header ? 'th' : 'td', {
-  //     align,
-  //     colspan: colspan ? String(colspan) : undefined,
-  //     rowspan: rowspan ? String(rowspan) : undefined,
-  //   });
-  // },
   // image(node, state) {
   //   if (node.url?.startsWith('http')) {
   //     state.warn(`Image URL is remote (${node.url})`, node, 'image');
@@ -210,34 +225,10 @@ const handlers: Record<string, Handler> = {
     const caption = select('caption', node) as GenericNode;
     const graphic = select('graphic', node) as GenericNode;
     const title = select('title', node) as GenericNode;
-    state.openNode('container', { label: node.id, identifier: node.id });
+    state.openNode('container', { label: node.id, identifier: node.id, kind: 'figure' });
     const link = graphic?.['xlink:href'];
-    if (state.jats.source?.includes('elifesciences')) {
-      const elifeId = state.jats.doi?.split('/')[1].split('.')[1];
-      state.addLeaf('image', {
-        url: `https://iiif.elifesciences.org/lax:${elifeId}/${link}/full/617,/0/default.png`,
-        urlOptimized: `https://iiif.elifesciences.org/lax:${elifeId}/${link}/full/617,/0/default.webp`,
-      });
-    } else if (state.jats.source?.includes('joss')) {
-      const jossId = state.jats.doi?.split('/')[1].split('.')[1];
-      state.addLeaf('image', {
-        url: `https://raw.githubusercontent.com/openjournals/joss-papers/master/joss.${jossId}/${link}`,
-      });
-    } else if (state.jats.source?.includes('https://journals.plos.org')) {
-      // from: info:doi/10.1371/journal.pmed.1004118.g001
-      // to: https://journals.plos.org/plosmedicine/article/figure/image?size=inline&id=10.1371/journal.pmed.1004118.g001
-      // size is "inline" or "large"
-      // e.g. "plosmedicine"
-      const journal = new URL(state.jats.source).pathname.split('/')[1];
-      const figureDoi = link?.replace(/^info:doi/, '');
-      const size = 'large';
-      const url = `https://journals.plos.org/${journal}/article/figure/image?size=${size}&id=${figureDoi}`;
-      state.addLeaf('image', { url });
-    } else {
-      const pmcid = state.jats.pmc;
-      state.addLeaf('image', {
-        url: `https://www.ncbi.nlm.nih.gov/pmc/articles/PMC${pmcid}/bin/${link}.jpg`,
-      });
+    if (link) {
+      state.addLeaf('image', { url: link });
     }
     state.openNode('caption');
     if (title) {
@@ -249,6 +240,55 @@ const handlers: Record<string, Handler> = {
     state.renderChildren(caption);
     state.closeNode();
     state.closeNode();
+  },
+  ['table-wrap'](node, state) {
+    const caption = (select('caption', node) ?? select('lable', node)) as GenericNode;
+    state.openNode('container', { label: node.id, identifier: node.id, kind: 'table' });
+    if (caption) {
+      state.openNode('caption');
+      state.renderChildren(caption);
+      state.closeNode();
+    }
+    state.renderChildren(node);
+    state.closeNode();
+  },
+  table(node, state) {
+    state.openNode('table');
+    state.renderChildren(node);
+    state.closeNode();
+  },
+  thead(node, state) {
+    state.renderChildren(node);
+  },
+  tbody(node, state) {
+    state.renderChildren(node);
+  },
+  tfoot(node, state) {
+    state.renderChildren(node);
+  },
+  tr(node, state) {
+    state.openNode('tableRow');
+    state.renderChildren(node);
+    state.closeNode();
+  },
+  th(node, state) {
+    const { align, colspan, rowspan } = node;
+    state.openNode('tableCell', { header: true, align, colspan, rowspan });
+    state.renderChildren(node);
+    state.closeNode();
+  },
+  td(node, state) {
+    const { align, colspan, rowspan } = node;
+    state.openNode('tableCell', { align, colspan, rowspan });
+    state.renderChildren(node);
+    state.closeNode();
+  },
+  break(node, state) {
+    state.addLeaf('break');
+  },
+  ['named-content'](node, state) {
+    // TODO: Not just ignore things marked as named-content
+    state.renderChildren(node);
   },
   // container(node, state) {
   //   state.data.isInContainer = true;

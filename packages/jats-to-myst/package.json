@@ -35,9 +35,10 @@
     "url": "https://github.com/executablebooks/mystmd/issues"
   },
   "dependencies": {
-    "doi-utils": "^2.0.0",
+    "doi-utils": "^2.0.2",
     "jats-tags": "^1.0.8",
     "jats-xml": "^1.0.8",
+    "mathml-to-latex": "^1.3.0",
     "myst-common": "^1.1.15",
     "myst-frontmatter": "^1.1.15",
     "myst-spec": "^0.0.4",
@@ -48,7 +49,8 @@
     "unist-util-select": "^4.0.3",
     "unist-util-remove": "^3.1.0",
     "vfile": "^5.0.0",
-    "vfile-reporter": "^7.0.4"
+    "vfile-reporter": "^7.0.4",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "myst-to-tex": "^1.0.14"
