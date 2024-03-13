@@ -22,6 +22,7 @@ export type Export = {
   output?: string;
   toc?: string;
   articles?: ExportArticle[];
+  imports?: string[];
   /** sub_articles are only for jats xml export */
   sub_articles?: string[];
   /** MECA: to, from later */
