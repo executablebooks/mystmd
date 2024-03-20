@@ -81,6 +81,35 @@ function rewriteAssetsFolder(directory: string, baseurl?: string): void {
 }
 
 /**
+ * Get the baseurl from BASE_URL or common deployment environments
+ *
+ * @param session session with logging
+ */
+function get_baseurl(session: ISession): string | undefined {
+  let baseurl;
+  // BASE_URL always takes precedence. If it's not defined, check common deployment environments.
+  if ((baseurl = process.env.BASE_URL)) {
+    session.log.info('BASE_URL environment overwrite is set');
+  } else if ((baseurl = process.env.READTHEDOCS_CANONICAL_URL)) {
+    // Get only the path part of the RTD url, without trailing `/`
+    baseurl = new URL(baseurl).pathname.replace(/\/$/, '');
+    session.log.info(
+      `Building inside a ReadTheDocs environment for ${process.env.READTHEDOCS_CANONICAL_URL}`,
+    );
+  }
+  // Check if baseurl was set to any value, otherwise print a hint on how to set it manually.
+  if (baseurl) {
+    session.log.info(`Building the site with a baseurl of "${baseurl}"`);
+  } else {
+    // The user should only use `BASE_URL` to set the value manually.
+    session.log.info(
+      'Building the base site.\nTo set a baseurl (e.g. GitHub pages) use "BASE_URL" environment variable.',
+    );
+  }
+  return baseurl;
+}
+
+/**
  * Build a MyST project as a static HTML deployment
  *
  * @param session session with logging
@@ -89,14 +118,7 @@ function rewriteAssetsFolder(directory: string, baseurl?: string): void {
 export async function buildHtml(session: ISession, opts: any) {
   const template = await getMystTemplate(session, opts);
   // The BASE_URL env variable allows for mounting the site in a folder, e.g., github pages
-  const baseurl = process.env.BASE_URL;
-  if (baseurl) {
-    session.log.info(`Building the site with a baseurl of "${baseurl}"`);
-  } else {
-    session.log.info(
-      'Building the base site.\nTo set a baseurl (e.g. GitHub pages) use "BASE_URL" environment variable.',
-    );
-  }
+  const baseurl = get_baseurl(session);
   // Note, this process is really only for Remix templates
   // We could add a flag in the future for other templates
   const htmlDir = path.join(session.buildPath(), 'html');
