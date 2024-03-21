@@ -1,5 +1,19 @@
 import yaml from 'js-yaml';
-import type { TOC, ArticleTOC, BookTOC, BasicTOC } from './types.js';
+import type {
+  TOC,
+  ArticleTOC,
+  BookTOC,
+  BasicTOC,
+  ToctreeOptions,
+  ArticleHasSubtrees,
+  ArticleSubtree,
+  ArticleShorthandSubtree,
+  ArticleEntry,
+  BasicHasSubtrees,
+  BasicSubtree,
+  BasicShorthandSubtree,
+  BasicEntry,
+} from './types.js';
 import schema from './schema.json';
 import _Ajv from 'ajv';
 
@@ -148,7 +162,7 @@ export function parseTOC(contents: string): { toc: TOC; didUpgrade: boolean } {
     didUpgrade = true;
   }
 
-  const ajv = new Ajv.default();
+  const ajv = new Ajv();
   const validate = ajv.compile(schema);
   if (!validate(toc)) {
     throw new Error(
@@ -169,4 +183,73 @@ export function isBookTOC(toc: TOC): toc is BookTOC {
 
 export function isArticleTOC(toc: TOC): toc is ArticleTOC {
   return (toc as any).format === 'jb-article';
+}
+
+function bookToBasic(toc: BookTOC): BasicTOC {
+  throw new Error('not implemented');
+}
+
+function articleToBasic(toc: ArticleTOC): BasicTOC {
+  // Set new default
+  const defaults = (toc.defaults ?? (toc.defaults = {})) as ToctreeOptions;
+  defaults.titlesonly = defaults.titlesonly ?? true;
+
+  const transformSubtree = (item: ArticleSubtree): BasicSubtree => {
+    const { sections, ...rest } = item;
+    return { entries: sections.map(transformEntry), ...rest };
+  };
+
+  const transformHasSubtrees = (item: ArticleHasSubtrees): BasicHasSubtrees => {
+    return { subtrees: item.subtrees.map(transformSubtree) };
+  };
+
+  const transformShorthandSubtree = (item: ArticleShorthandSubtree): BasicShorthandSubtree => {
+    return { options: item.options, ...transformSubtree(item) };
+  };
+
+  const transformEntry = (item: ArticleEntry): BasicEntry => {
+    // Explicit subtrees
+    if ('subtrees' in item) {
+      const { subtrees, ...rest } = item;
+      return { ...rest, ...transformHasSubtrees(item as ArticleHasSubtrees) };
+    }
+    // Default subtree
+    else if ('sections' in item) {
+      const { sections, options, ...rest } = item;
+      // Rename sections to entries
+      return { ...rest, ...transformShorthandSubtree(item as ArticleShorthandSubtree) };
+    } else {
+      return item;
+    }
+  };
+  const transformTOC = (item: ArticleTOC): BasicTOC => {
+    // Drop format
+    const { format, ...withoutFormat } = item;
+    // Explicit subtrees
+    if ('subtrees' in withoutFormat) {
+      const { subtrees, ...rest } = withoutFormat;
+      return { ...rest, ...transformHasSubtrees(withoutFormat as ArticleHasSubtrees) };
+    }
+    // Default subtree
+    else if ('sections' in withoutFormat) {
+      const { sections, options, ...rest } = withoutFormat;
+      // Rename sections to entries
+      return { ...rest, ...transformShorthandSubtree(withoutFormat as ArticleShorthandSubtree) };
+    } else {
+      return withoutFormat;
+    }
+  };
+  return transformTOC(toc);
+}
+
+export function asBasicTOC(toc: TOC): BasicTOC {
+  if (isBasicTOC(toc)) {
+    return toc;
+  } else if (isArticleTOC(toc)) {
+    return articleToBasic(toc);
+  } else if (isBookTOC(toc)) {
+    return bookToBasic(toc);
+  } else {
+    throw new Error('impossible format');
+  }
 }

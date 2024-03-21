@@ -10,9 +10,8 @@ import { selectors } from '../store/index.js';
 import { projects } from '../store/reducers.js';
 import { addWarningForFile } from '../utils/addWarningForFile.js';
 import { getAllBibTexFilesOnPath } from '../utils/getAllBibtexFiles.js';
-import { validateTOC } from '../utils/toc.js';
 import { projectFromPath } from './fromPath.js';
-import { projectFromToc } from './fromToc.js';
+import { projectFromToc, validateTOC } from './fromToc.js';
 import { writeTocFromProject } from './toToc.js';
 import type { LocalProject, LocalProjectPage } from './types.js';
 

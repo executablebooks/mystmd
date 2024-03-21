@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import yaml from 'js-yaml';
 import { join, relative } from 'node:path';
 import { removeExtension } from '../utils/removeExtension.js';
-import type { JupyterBookChapter, TOC } from '../utils/toc.js';
+import type { JupyterBookChapter, TOC } from 'sphinx-external-toc';
 import type { PageLevels, LocalProjectFolder, LocalProjectPage, LocalProject } from './types.js';
 
 function getRelativeDocumentLink(file: string, path: string) {
