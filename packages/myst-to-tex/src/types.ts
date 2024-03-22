@@ -25,6 +25,7 @@ export type LatexResult = {
 export type MathPlugins = Required<PageFrontmatter>['math'];
 
 export type Options = MystToTexSettings & {
+  imports?: string[];
   handlers?: Record<string, Handler>;
   math?: MathPlugins;
   bibliography?: 'natbib' | 'biblatex';
