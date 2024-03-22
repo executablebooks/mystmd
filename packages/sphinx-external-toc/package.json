@@ -1,0 +1,42 @@
+{
+  "name": "sphinx-external-toc",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "license": "MIT",
+  "description": "sphinx-external-toc Table of Contents types and validation",
+  "author": "Angus Hollands <goosey15@gmail.com>",
+  "homepage": "https://github.com/executablebooks/mystmd/tree/main/packages/sphinx-external-toc",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/executablebooks/mystmd.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist ./src/schema.json",
+    "lint": "eslint \"src/**/!(*.spec).ts\" -c ./.eslintrc.cjs",
+    "lint:format": "npx prettier --check \"src/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "build:esm": "tsc",
+    "build:schema": "npx ts-json-schema-generator --path src/types.ts --type TOC -o ./src/schema.json",
+    "build": "npm-run-all -s -l clean build:schema build:esm"
+  },
+  "bugs": {
+    "url": "https://github.com/executablebooks/mystmd/issues"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "ts-json-schema-generator": "^1.5.0"
+  }
+}

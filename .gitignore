@@ -40,3 +40,4 @@ _build
 yalc.lock
 
 *.docx
+schemas/
