@@ -177,7 +177,7 @@ export async function transformMdast(
     })
     .use(inlineMathSimplificationPlugin)
     .use(mathPlugin, { macros: frontmatter.math })
-    .use(glossaryPlugin) // This should be before the enumerate plugins
+    .use(glossaryPlugin, {}) // This should be before the enumerate plugins
     .use(abbreviationPlugin, { abbreviations: frontmatter.abbreviations })
     .use(enumerateTargetsPlugin, { state }) // This should be after math/container transforms
     .use(joinGatesPlugin);
