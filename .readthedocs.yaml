@@ -1,0 +1,16 @@
+version: 2
+build:
+  os: ubuntu-lts-latest
+  tools:
+    nodejs: "20"
+  commands:
+    - npm install
+    - npm run build
+    - npm run --workspace packages/mystmd link
+    - myst --version
+    - cd docs && BASE_URL=${READTHEDOCS_CANONICAL_URL} myst build --html
+    # TODO: Switch to rsync
+    # https://github.com/readthedocs/readthedocs.org/issues/11219
+#    - /usr/bin/rsync -a --mkpath docs/_build/ $READTHEDOCS_OUTPUT/
+    - mkdir -p $READTHEDOCS_OUTPUT
+    - cp -a docs/_build/* $READTHEDOCS_OUTPUT/
