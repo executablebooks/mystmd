@@ -14,21 +14,26 @@ export type Options = {
  * Lift out definitionTerms from top-level `TERM\nDEFINITION` text nodes
  */
 function maybeLiftLegacyDefinitionTerm(node: GenericParent): GenericParent | undefined {
+  // Only operate on paragraphs
   if (node.type !== 'paragraph') {
     return undefined;
   }
+  // Require that the first child is a Text node
   const firstChild = node.children[0];
   if (firstChild?.type !== 'text') {
     return undefined;
   }
+  // Require that we have a newline in the value, and locate it
   const value = firstChild.value as string;
   const index = value.indexOf('\n');
   if (index === -1) {
     return undefined;
   }
+  // Split the value into a term and a remainder
   const term = value.slice(0, index);
   const remainder = value.slice(index + 1, value.length);
   firstChild.value = remainder;
+  // Return the lifted term
   return {
     type: 'definitionTerm',
     children: [{ type: 'text', value: term }],
