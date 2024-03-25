@@ -39,6 +39,7 @@ import type { RendererData } from '../transforms/types.js';
 
 import {
   checkLinksTransform,
+  csvTableTransform,
   embedTransform,
   importMdastFromJson,
   includeFilesTransform,
@@ -164,6 +165,7 @@ export async function transformMdast(
   frontmatterPartsTransform(session, file, mdast, frontmatter);
   importMdastFromJson(session, file, mdast);
   await includeFilesTransform(session, file, mdast, vfile);
+  await csvTableTransform(session, mdast, vfile);
   rawDirectiveTransform(mdast, vfile);
   // This needs to come before basic transformations since it may add labels to blocks
   liftCodeMetadataToBlock(session, vfile, mdast);

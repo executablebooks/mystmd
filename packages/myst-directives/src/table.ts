@@ -1,6 +1,7 @@
 import type { DirectiveSpec, DirectiveData, GenericNode } from 'myst-common';
 import { fileError, normalizeLabel, RuleId } from 'myst-common';
 import type { VFile } from 'vfile';
+import { parse } from 'csv-parse/sync';
 
 export const tableDirective: DirectiveSpec = {
   name: 'table',
@@ -162,3 +163,72 @@ export const listTableDirective: DirectiveSpec = {
     return [container];
   },
 };
+
+
+export const csvTableDirective: DirectiveSpec = {
+  name: 'csv-table',
+  arg: {
+    type: 'myst',
+  },
+  options: {
+    label: {
+      type: String,
+      alias: ['name'],
+    },
+    'header-rows': {
+      type: Number,
+      // nonnegative int
+    },
+    class: {
+      type: String,
+      // class_option: list of strings?
+      doc: `CSS classes to add to your table. Special classes include:
+
+- \`full-width\`: changes the table environment to cover two columns in LaTeX`,
+    },
+    align: {
+      type: String,
+      // choice(['left', 'center', 'right'])
+    },
+    delim: {
+      type: String
+    },
+    escape: {
+      type: String,
+    },
+    keepspace: {
+      type: Boolean,
+    },
+    quote: {
+      type: String
+    }
+  },
+  body: {
+    type: String,
+    required: true,
+  },
+  run(data: DirectiveData): GenericNode[] {
+    const delimiter = (data.options?.delimiter ?? ',') as string;
+    const records = parse(data.body as string, {
+      delimiter,
+      ltrim: !data.options?.keepspace,
+      escape: (data.options?.escape ?? delimiter) as string,
+      quote: (data.options?.quote ?? '"') as string
+    });
+
+    const { label, identifier } = normalizeLabel(data.options?.label as string | undefined) || {};
+    const csvTable = {
+      type: 'csv-table',
+      records,      
+      headerCount: (data.options?.['header-rows'] as number) || 0,
+      label,
+      identifier,
+      class: data.options?.class,
+      align: data.options?.align,
+      children: data.arg as GenericNode[],
+
+    };
+    return [ csvTable ];
+  }
+};
+
