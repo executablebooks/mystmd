@@ -7,7 +7,7 @@ import { figureDirective } from './figure.js';
 import { iframeDirective } from './iframe.js';
 import { imageDirective } from './image.js';
 import { includeDirective } from './include.js';
-import { tableDirective, listTableDirective } from './table.js';
+import { csvTableDirective, tableDirective, listTableDirective } from './table.js';
 import { asideDirective } from './aside.js';
 import { glossaryDirective } from './glossary.js';
 import { mathDirective } from './math.js';
@@ -23,6 +23,7 @@ export const defaultDirectives = [
   bibliographyDirective,
   codeDirective,
   codeCellDirective,
+  csvTableDirective,
   dropdownDirective,
   embedDirective,
   blockquoteDirective,
@@ -51,7 +52,7 @@ export { figureDirective } from './figure.js';
 export { iframeDirective } from './iframe.js';
 export { imageDirective } from './image.js';
 export { includeDirective } from './include.js';
-export { listTableDirective, tableDirective } from './table.js';
+export { csvTableDirective, listTableDirective, tableDirective } from './table.js';
 export { asideDirective } from './aside.js';
 export { mathDirective } from './math.js';
 export { mdastDirective } from './mdast.js';

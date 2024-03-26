@@ -9,3 +9,4 @@ export * from './mdast.js';
 export * from './outputs.js';
 export * from './inlineExpressions.js';
 export * from './types.js';
+export * from './table.js';
