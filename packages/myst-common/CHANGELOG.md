@@ -1,5 +1,16 @@
 # myst-common
 
+## 1.1.32
+
+### Patch Changes
+
+- 117d6008: Allow parts mapping to be case insensitive.
+- ebe65816: Remove quotes from label identifiers
+- 20108545: Add block tightness to the directive data
+- 117d6008: Case insensitivity in parts, and allow spaces when picking up JATS titles.
+- Updated dependencies [6f0183d]
+  - myst-frontmatter@1.1.32
+
 ## 1.1.31
 
 ### Patch Changes

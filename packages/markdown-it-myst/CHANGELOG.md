@@ -1,5 +1,11 @@
 # markdown-it-myst
 
+## 1.0.6
+
+### Patch Changes
+
+- 20108545: Add block tightness to the directives
+
 ## 1.0.5
 
 ### Patch Changes

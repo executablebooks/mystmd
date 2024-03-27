@@ -1,5 +1,11 @@
 # myst-frontmatter
 
+## 1.1.32
+
+### Patch Changes
+
+- 6f0183d: Add copyright to frontmatter
+
 ## 1.1.31
 
 ### Patch Changes

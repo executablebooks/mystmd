@@ -1,5 +1,21 @@
 # myst-transforms
 
+## 1.3.2
+
+### Patch Changes
+
+- 20108545: Keep math tightness when lifting from paragraphs
+- Updated dependencies [117d6008]
+- Updated dependencies [ebe65816]
+- Updated dependencies [20108545]
+- Updated dependencies [6f0183d]
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+  - myst-common@1.1.32
+  - myst-spec-ext@1.1.32
+  - myst-frontmatter@1.1.32
+  - myst-to-html@1.2.1
+
 ## 1.3.1
 
 ### Patch Changes
