@@ -13,6 +13,14 @@ export type SiteFrontmatter = {
   banner?: string | null;
   bannerOptimized?: string;
   authors?: Contributor[];
+
+  /**
+   * Reviewers and editors are author/contributor ids.
+   * If an object is provided for these fields, it will be moved to contributors
+   * and replaced with id reference.
+   */
+  reviewers?: string[];
+  editors?: string[];
   affiliations?: Affiliation[];
   venue?: Venue;
   github?: string;

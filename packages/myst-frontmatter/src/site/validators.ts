@@ -27,6 +27,8 @@ export const SITE_FRONTMATTER_KEYS = [
   'banner',
   'bannerOptimized',
   'authors',
+  'reviewers',
+  'editors',
   'contributors',
   'venue',
   'github',
@@ -38,6 +40,8 @@ export const SITE_FRONTMATTER_KEYS = [
 
 export const FRONTMATTER_ALIASES = {
   author: 'authors',
+  reviewer: 'reviewers',
+  editor: 'editors',
   contributor: 'contributors',
   affiliation: 'affiliations',
   export: 'exports',
@@ -131,6 +135,36 @@ export function validateSiteFrontmatterKeys(value: Record<string, any>, opts: Va
           'contributors',
           (v: any, o: ValidationOptions) => validateContributor(v, stash, o),
           incrementOptions(`contributors.${index}`, opts),
+        );
+      },
+    );
+  }
+  if (defined(value.reviewers)) {
+    output.reviewers = validateList(
+      value.reviewers,
+      { coerce: true, ...incrementOptions('reviewers', opts) },
+      (reviewer, ind) => {
+        return validateAndStashObject(
+          reviewer,
+          stash,
+          'contributors',
+          (v: any, o: ValidationOptions) => validateContributor(v, stash, o),
+          incrementOptions(`reviewers.${ind}`, opts),
+        );
+      },
+    );
+  }
+  if (defined(value.editors)) {
+    output.editors = validateList(
+      value.editors,
+      { coerce: true, ...incrementOptions('editors', opts) },
+      (editor, ind) => {
+        return validateAndStashObject(
+          editor,
+          stash,
+          'contributors',
+          (v: any, o: ValidationOptions) => validateContributor(v, stash, o),
+          incrementOptions(`editors.${ind}`, opts),
         );
       },
     );

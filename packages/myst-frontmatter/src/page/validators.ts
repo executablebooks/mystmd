@@ -17,6 +17,8 @@ import { FRONTMATTER_ALIASES } from '../site/validators.js';
 
 export const USE_PROJECT_FALLBACK = [
   'authors',
+  'reviewers',
+  'editors',
   'date',
   'doi',
   'arxiv',

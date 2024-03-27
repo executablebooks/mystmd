@@ -55,7 +55,7 @@ export function fillPageFrontmatter(
     };
   }
 
-  // Gather all contributors and affiliations from funding sources
+  // Gather all contributor and affiliation ids from funding sources
   const contributorIds: Set<string> = new Set();
   const affiliationIds: Set<string> = new Set();
   frontmatter.funding?.forEach((fund) => {
@@ -70,6 +70,14 @@ export function fillPageFrontmatter(
         affiliationIds.add(aff);
       });
     });
+  });
+
+  // Gather all contributor ids from reviewers and editors
+  frontmatter.reviewers?.forEach((reviewer) => {
+    contributorIds.add(reviewer);
+  });
+  frontmatter.editors?.forEach((editor) => {
+    contributorIds.add(editor);
   });
 
   if (frontmatter.authors?.length || contributorIds.size) {
