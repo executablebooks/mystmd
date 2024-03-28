@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import type { ValidationOptions } from 'simple-validators';
 import { validateContributor } from '../contributors/validators';
-import { validateAndStashObject } from './referenceStash';
+import { isStashPlaceholder, validateAndStashObject } from './referenceStash';
 
 let opts: ValidationOptions;
 
@@ -205,5 +205,27 @@ describe('validateAndStashObject', () => {
       ],
     });
     expect(opts.messages.warnings?.length).toEqual(1);
+  });
+});
+
+describe('isStashPlaceholder', () => {
+  it.each([
+    [{}, false],
+    [{ name: 'name' }, false],
+    [{ id: 'name' }, false],
+    [{ name: 'name', id: 'name' }, true],
+    [{ name: 'name', id: 'id' }, false],
+    [{ name: 'name', id: 'name', extra: 'name' }, false],
+    [{ name: 'name', nameParsed: { literal: 'name', family: 'name' } }, false],
+    [{ id: 'name', nameParsed: { literal: 'name', family: 'name' } }, false],
+    [{ name: 'name', id: 'name', nameParsed: { literal: 'name' } }, true],
+    [{ name: 'name', id: 'name', nameParsed: { literal: 'name', family: 'name' } }, true],
+    [{ name: 'name', id: 'name', nameParsed: { family: 'name' } }, false],
+    [
+      { name: 'name', id: 'name', nameParsed: { literal: 'name', family: 'name' }, extra: 'name' },
+      false,
+    ],
+  ])(`%s - %s`, async (input, result) => {
+    expect(isStashPlaceholder(input as any)).toBe(result);
   });
 });

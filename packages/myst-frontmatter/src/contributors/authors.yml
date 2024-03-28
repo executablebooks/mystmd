@@ -342,3 +342,29 @@ cases:
             given: Just A.
             family: Name
     warnings: 1
+  - title: author as id resolves as placeholder
+    raw:
+      author:
+        id: Just A. Name
+    normalized:
+      authors:
+        - id: Just A. Name
+          name: Just A. Name
+          nameParsed:
+            literal: Just A. Name
+            given: Just A.
+            family: Name
+  - title: reviewer as ref resolves as placeholder
+    raw:
+      reviewer:
+        ref: Just A. Name
+    normalized:
+      reviewers:
+        - Just A. Name
+      contributors:
+        - id: Just A. Name
+          name: Just A. Name
+          nameParsed:
+            literal: Just A. Name
+            given: Just A.
+            family: Name

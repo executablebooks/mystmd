@@ -12,12 +12,16 @@ import {
   validationError,
   validationWarning,
 } from 'simple-validators';
+import { orcid } from 'orcid';
 import { validateAffiliation } from '../affiliations/validators.js';
 import type { ReferenceStash } from '../utils/referenceStash.js';
-import { validateAndStashObject } from '../utils/referenceStash.js';
+import {
+  isStashPlaceholder,
+  stashPlaceholder,
+  validateAndStashObject,
+} from '../utils/referenceStash.js';
 import type { Contributor, Name } from './types.js';
 import { formatName, parseName } from '../utils/parseName.js';
-import { orcid } from 'orcid';
 
 const CONTRIBUTOR_KEYS = [
   'id',
@@ -40,6 +44,7 @@ const CONTRIBUTOR_KEYS = [
   'fax',
 ];
 const CONTRIBUTOR_ALIASES = {
+  ref: 'id', // Used in QMD to reference a contributor
   role: 'roles',
   'equal-contributor': 'equal_contributor',
   affiliation: 'affiliations',
@@ -118,9 +123,6 @@ export function validateName(input: any, opts: ValidationOptions) {
   if (!output.family) {
     validationWarning(`No family name for name '${output.literal}'`, opts);
   }
-  if (!output.given) {
-    validationWarning(`No given name for name '${output.literal}'`, opts);
-  }
   return output;
 }
 
@@ -129,7 +131,7 @@ export function validateName(input: any, opts: ValidationOptions) {
  */
 export function validateContributor(input: any, stash: ReferenceStash, opts: ValidationOptions) {
   if (typeof input === 'string') {
-    input = { id: input, name: input };
+    input = stashPlaceholder(input);
   }
   const value = validateObjectKeys(
     input,
@@ -137,6 +139,11 @@ export function validateContributor(input: any, stash: ReferenceStash, opts: Val
     opts,
   );
   if (value === undefined) return undefined;
+  // If contributor only has an id, give it a matching name; this is equivalent to the case
+  // where a simple string is provided as a contributor.
+  if (Object.keys(value).length === 1 && value.id) {
+    value.name = value.id;
+  }
   const output: Contributor = {};
   if (defined(value.id)) {
     output.id = validateString(value.id, incrementOptions('id', opts));
@@ -255,6 +262,9 @@ export function validateContributor(input: any, stash: ReferenceStash, opts: Val
   }
   if (defined(value.note)) {
     output.note = validateString(value.note, incrementOptions('note', opts));
+  }
+  if (!isStashPlaceholder(output) && output.nameParsed && !output.nameParsed?.given) {
+    validationWarning(`No given name for name '${output.nameParsed.literal}'`, opts);
   }
   return output;
 }

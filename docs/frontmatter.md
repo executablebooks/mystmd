@@ -92,10 +92,16 @@ The following table lists the available frontmatter fields, a brief description 
   - a valid date formatted string
   - page can override project
 * - `authors`
-  - a list of author objects
+  - a list of author objects, see [](#authors)
+  - page can override project
+* - `reviewers`
+  - a list of author objects or string ids, see [](#other-contributors)
+  - page can override project
+* - `editors`
+  - a list of author objects or string ids, see [](#other-contributors)
   - page can override project
 * - `affiliations`
-  - a list of affiliation objects
+  - a list of affiliation objects, see [](#affiliations)
   - page can override project
 * - `doi`
   - a valid DOI, either URL or id
@@ -107,13 +113,13 @@ The following table lists the available frontmatter fields, a brief description 
   - boolean (true/false)
   - page can override project
 * - `license`
-  - a license object or a string
+  - a license object or a string, see [](#licenses)
   - page can override project
 * - `copyright`
   - a string
   - page can override project
 * - `funding`
-  - a funding object
+  - a funding object, see [](#funding)
   - page can override project
 * - `github`
   - a valid GitHub URL or `owner/reponame`
@@ -246,6 +252,8 @@ The `authors` field is a list of `author` objects. Available fields in the autho
   - description
 * - `name`
   - a string OR CSL-JSON author object - the author’s full name; if a string, this will be parsed automatically. Otherwise, the object may contain `given`, `surname`, `non_dropping_particle`, `dropping_particle`, `suffix`, and full name `literal`
+* - `id`
+  - a string - a local identifier that can be used to reference a repeated author
 * - `orcid`
   - a string - a valid ORCID identifier with or without the URL
 * - `corresponding`
@@ -322,6 +330,12 @@ The `authors` field is a list of `author` objects. Available fields in the autho
 * - `fax`
   - for people who still use these machines, beep, boop, beeeep! 📠🎶
 ````
+
+(other-contributors)=
+
+### Reviewers, Editors, Funding Recipients
+
+Other contributors besides authors may be listed elsewhere in the frontmatter. These include `reviewers`, `editors`, and [funding](#funding) award `investigators` and `recipients`. For all of these fields, you may use a full [author object](#authors), or you may use the string `id` from an existing author object defined elsewhere in your frontmatter.
 
 (affiliations)=
 
@@ -440,7 +454,7 @@ affiliations:
 * - field
   - description
 * - `id`
-  - a string - a local identifier that can be used to easily reference a repeated affiliation
+  - a string - a local identifier that can be used to reference a repeated affiliation
 * - `name`
   - a string - the affiliation name. Either `name` or `institution` is required
 * - `institution`
@@ -493,6 +507,8 @@ The date field is a string and should conform to a valid Javascript data format.
 
 Where the latter example in that list are valid [IETF timestamps](https://datatracker.ietf.org/doc/html/rfc2822#page-14)
 
+(licenses)=
+
 ## Licenses
 
 This field can be set to a string value directly or to a License object.
@@ -533,7 +549,7 @@ It may be as simple as a single funding statement:
 funding: This work was supported by University.
 ```
 
-Funding may also specify award id, name, sources ([affiliation object or reference](#affiliations)), investigators ([contributor objects or references](#authors)), and recipients ([contributor objects or references](#authors)).
+Funding may also specify award id, name, sources ([affiliation object or reference](#affiliations)), investigators ([contributor objects or references](#other-contributors)), and recipients ([contributor objects or references](#other-contributors)).
 
 ```yaml
 authors:

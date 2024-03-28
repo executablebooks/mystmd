@@ -166,3 +166,133 @@ cases:
             family: Author
             given: Test
     errors: 1
+  - title: editor/reviewer added to collaborators
+    raw:
+      reviewer: Jane Doe
+      editor: John Doe
+    normalized:
+      reviewers:
+        - Jane Doe
+      editors:
+        - John Doe
+      contributors:
+        - id: Jane Doe
+          name: Jane Doe
+          nameParsed:
+            literal: Jane Doe
+            family: Doe
+            given: Jane
+        - id: John Doe
+          name: John Doe
+          nameParsed:
+            literal: John Doe
+            family: Doe
+            given: John
+  - title: editor/reviewer collaborators pass
+    raw:
+      reviewers:
+        - janedoe
+      editors:
+        - johndoe
+      contributors:
+        - id: janedoe
+          name: Jane Doe
+          nameParsed:
+            literal: Jane Doe
+            family: Doe
+            given: Jane
+        - id: johndoe
+          name: John Doe
+          nameParsed:
+            literal: John Doe
+            family: Doe
+            given: John
+    normalized:
+      reviewers:
+        - janedoe
+      editors:
+        - johndoe
+      contributors:
+        - id: janedoe
+          name: Jane Doe
+          nameParsed:
+            literal: Jane Doe
+            family: Doe
+            given: Jane
+        - id: johndoe
+          name: John Doe
+          nameParsed:
+            literal: John Doe
+            family: Doe
+            given: John
+  - title: editor/reviewer authors pass
+    raw:
+      reviewers:
+        - janedoe
+      editors:
+        - johndoe
+      authors:
+        - id: janedoe
+          name: Jane Doe
+          nameParsed:
+            literal: Jane Doe
+            family: Doe
+            given: Jane
+        - id: johndoe
+          name: John Doe
+          nameParsed:
+            literal: John Doe
+            family: Doe
+            given: John
+    normalized:
+      reviewers:
+        - janedoe
+      editors:
+        - johndoe
+      authors:
+        - id: janedoe
+          name: Jane Doe
+          nameParsed:
+            literal: Jane Doe
+            family: Doe
+            given: Jane
+        - id: johndoe
+          name: John Doe
+          nameParsed:
+            literal: John Doe
+            family: Doe
+            given: John
+  - title: author as id reference resolves to object
+    raw:
+      reviewers:
+        - id: janedoe
+          name: Jane Doe
+          nameParsed:
+            literal: Jane Doe
+            family: Doe
+            given: Jane
+        - id: johndoe
+          name: John Doe
+          nameParsed:
+            literal: John Doe
+            family: Doe
+            given: John
+      author: janedoe
+    normalized:
+      reviewers:
+        - janedoe
+        - johndoe
+      authors:
+        - id: janedoe
+          name: Jane Doe
+          nameParsed:
+            literal: Jane Doe
+            family: Doe
+            given: Jane
+      contributors:
+        - id: johndoe
+          name: John Doe
+          nameParsed:
+            literal: John Doe
+            family: Doe
+            given: John
