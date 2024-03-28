@@ -14,7 +14,7 @@ import { stashPlaceholder } from '../utils/referenceStash.js';
 import { validateDoi } from '../utils/validators.js';
 import type { Affiliation } from './types.js';
 
-const AFFILIATION_KEYS = [
+export const AFFILIATION_KEYS = [
   'id',
   'address',
   'city',
@@ -34,7 +34,7 @@ const AFFILIATION_KEYS = [
   'fax',
 ];
 
-const AFFILIATION_ALIASES = {
+export const AFFILIATION_ALIASES = {
   ref: 'id', // Used in QMD to reference an affiliation
   region: 'state',
   province: 'state',
