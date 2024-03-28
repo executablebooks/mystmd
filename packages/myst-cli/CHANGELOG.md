@@ -1,5 +1,30 @@
 # myst-cli
 
+## 1.1.49
+
+### Patch Changes
+
+- ebe65816: Fix term label fixing with typography quote enhancements
+- 117d6008: Case insensitivity in parts, and allow spaces when picking up JATS titles.
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+- Updated dependencies [ebe65816]
+- Updated dependencies [20108545]
+- Updated dependencies [6f0183d]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+  - myst-to-tex@1.0.24
+  - myst-common@1.1.32
+  - myst-spec-ext@1.1.32
+  - myst-frontmatter@1.1.32
+  - myst-parser@1.2.1
+  - myst-transforms@1.3.2
+  - myst-config@1.1.32
+  - tex-to-myst@1.0.24
+
 ## 1.1.48
 
 ### Patch Changes

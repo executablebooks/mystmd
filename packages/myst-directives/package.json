@@ -1,6 +1,6 @@
 {
   "name": "myst-directives",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "sideEffects": false,
   "license": "MIT",
   "description": "Default directive definitions for MyST",
@@ -34,8 +34,8 @@
   "dependencies": {
     "classnames": "^2.3.2",
     "js-yaml": "^4.1.0",
-    "myst-common": "^1.1.31",
-    "myst-spec-ext": "^1.1.31",
+    "myst-common": "^1.1.32",
+    "myst-spec-ext": "^1.1.32",
     "nanoid": "^4.0.2",
     "unist-util-select": "^4.0.3",
     "vfile": "^5.3.7"
