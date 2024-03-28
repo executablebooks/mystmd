@@ -188,6 +188,45 @@ cases:
             family: Name
           email: example@example.com
           corresponding: true
+  - title: First email is corresponding (unless collaboration)
+    raw:
+      author:
+        id: my-group
+        name: Research Group
+        collaboration: true
+        email: example@example.com
+    normalized:
+      authors:
+        - id: my-group
+          name: Research Group
+          collaboration: true
+          email: example@example.com
+  - title: Collaboration cannot be corresponding (first Person gets corresponding flag)
+    raw:
+      authors:
+        - id: my-group
+          name: Research Group
+          collaboration: true
+          email: example@example.com
+          corresponding: true
+        - id: jn
+          name: Just A. Name
+          email: example@example.com
+    normalized:
+      authors:
+        - id: my-group
+          name: Research Group
+          collaboration: true
+          email: example@example.com
+        - id: jn
+          name: Just A. Name
+          nameParsed:
+            literal: Just A. Name
+            given: Just A.
+            family: Name
+          email: example@example.com
+          corresponding: true
+    warnings: 1
   - title: Warn if author has no name
     raw:
       authors:
