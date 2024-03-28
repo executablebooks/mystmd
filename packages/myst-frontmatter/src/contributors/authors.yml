@@ -134,6 +134,33 @@ cases:
             family: Name
           email: example@example.com
           corresponding: false
+  - title: No email is corresponding if first is false
+    raw:
+      author:
+        - id: jn
+          name: Just A. Name
+          email: example@example.com
+          corresponding: false
+        - id: an
+          name: A. Nother Name
+          email: example@example.com
+    normalized:
+      authors:
+        - id: jn
+          name: Just A. Name
+          nameParsed:
+            literal: Just A. Name
+            given: Just A.
+            family: Name
+          email: example@example.com
+          corresponding: false
+        - id: an
+          name: A. Nother Name
+          nameParsed:
+            literal: A. Nother Name
+            given: A. Nother
+            family: Name
+          email: example@example.com
   - title: Respect corresponding flag
     raw:
       authors:
