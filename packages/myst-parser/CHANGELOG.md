@@ -1,5 +1,23 @@
 # myst-parser
 
+## 1.2.1
+
+### Patch Changes
+
+- 20108545: Pass src to the state handlers
+- 20108545: compute AMS math tightness based on source
+- Updated dependencies [bba5baf]
+- Updated dependencies [117d6008]
+- Updated dependencies [ebe65816]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+  - myst-common@1.1.32
+  - markdown-it-myst@1.0.6
+  - myst-directives@1.2.1
+  - myst-roles@1.2.1
+
 ## 1.2.0
 
 ### Patch Changes

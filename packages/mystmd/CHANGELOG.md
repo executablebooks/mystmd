@@ -1,5 +1,11 @@
 # mystmd
 
+## 1.1.49
+
+### Patch Changes
+
+- 20108545: Handle math tightness for latex
+
 ## 1.1.48
 
 ## 1.1.47

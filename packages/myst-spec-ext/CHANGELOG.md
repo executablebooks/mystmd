@@ -1,5 +1,11 @@
 # myst-spec-ext
 
+## 1.1.32
+
+### Patch Changes
+
+- 20108545: Add tightness to math node extension
+
 ## 1.1.31
 
 ## 1.1.30

@@ -1,6 +1,6 @@
 {
   "name": "markdown-it-myst",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "sideEffects": false,
   "license": "MIT",
   "description": "markdown-it tokenizer for MyST roles and directives",

@@ -1,5 +1,37 @@
 # myst-cli
 
+## 1.1.49
+
+### Patch Changes
+
+- bba5baf: Refactor build for new collectExportOptions
+- ebe65816: Fix term label fixing with typography quote enhancements
+- bba5baf: Error on no typst executable
+- 117d6008: Case insensitivity in parts, and allow spaces when picking up JATS titles.
+- bba5baf: Refactor collectExportOptions for more flexibility
+- bba5baf: Update export validation for optional format
+- Updated dependencies [bba5baf]
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+- Updated dependencies [ebe65816]
+- Updated dependencies [20108545]
+- Updated dependencies [6f0183de]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [bba5baf]
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+- Updated dependencies [bba5baf]
+  - myst-common@1.1.32
+  - myst-to-tex@1.0.24
+  - myst-spec-ext@1.1.32
+  - myst-frontmatter@1.1.32
+  - myst-parser@1.2.1
+  - myst-transforms@1.3.2
+  - myst-config@1.1.32
+  - tex-to-myst@1.0.24
+
 ## 1.1.48
 
 ### Patch Changes

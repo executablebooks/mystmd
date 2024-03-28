@@ -1,5 +1,19 @@
 # myst-directives
 
+## 1.2.1
+
+### Patch Changes
+
+- 20108545: Add math tightness to the directive
+- Updated dependencies [bba5baf]
+- Updated dependencies [117d6008]
+- Updated dependencies [ebe65816]
+- Updated dependencies [20108545]
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+  - myst-common@1.1.32
+  - myst-spec-ext@1.1.32
+
 ## 1.2.0
 
 ### Minor Changes

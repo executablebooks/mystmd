@@ -1,5 +1,13 @@
 # myst-frontmatter
 
+## 1.1.32
+
+### Patch Changes
+
+- 6f0183de: Add copyright to frontmatter
+- bba5baf: Add zip to export frontmatter
+- bba5baf: Update export validation for optional format
+
 ## 1.1.31
 
 ### Patch Changes

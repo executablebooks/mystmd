@@ -1,5 +1,23 @@
 # myst-to-tex
 
+## 1.0.24
+
+### Patch Changes
+
+- 20108545: Respect math node tightness
+- Updated dependencies [bba5baf]
+- Updated dependencies [117d6008]
+- Updated dependencies [ebe65816]
+- Updated dependencies [20108545]
+- Updated dependencies [6f0183de]
+- Updated dependencies [bba5baf]
+- Updated dependencies [20108545]
+- Updated dependencies [117d6008]
+- Updated dependencies [bba5baf]
+  - myst-common@1.1.32
+  - myst-spec-ext@1.1.32
+  - myst-frontmatter@1.1.32
+
 ## 1.0.23
 
 ### Patch Changes
