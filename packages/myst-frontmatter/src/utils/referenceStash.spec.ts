@@ -1,7 +1,8 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import type { ValidationOptions } from 'simple-validators';
 import { validateContributor } from '../contributors/validators';
-import { validateAndStashObject } from './referenceStash';
+import type { ReferenceStash } from './referenceStash';
+import { finalizeStash, isStashPlaceholder, validateAndStashObject } from './referenceStash';
 
 let opts: ValidationOptions;
 
@@ -20,7 +21,7 @@ describe('validateAndStashObject', () => {
       opts,
     );
     expect(out).toEqual('Just A. Name');
-    expect(stash).toEqual({
+    expect(finalizeStash(stash)).toEqual({
       contributors: [
         {
           id: 'Just A. Name',
@@ -40,7 +41,7 @@ describe('validateAndStashObject', () => {
           nameParsed: { literal: 'Just A. Name', given: 'Just A.', family: 'Name' },
         },
       ],
-    };
+    } as ReferenceStash;
     const out = validateAndStashObject(
       'auth1',
       stash,
@@ -49,7 +50,7 @@ describe('validateAndStashObject', () => {
       opts,
     );
     expect(out).toEqual('auth1');
-    expect(stash).toEqual({
+    expect(finalizeStash(stash)).toEqual({
       contributors: [
         {
           id: 'auth1',
@@ -70,7 +71,7 @@ describe('validateAndStashObject', () => {
       { ...opts, file: 'folder/test.file.yml' },
     );
     expect(out).toEqual('contributors-test-file-generated-uid-0');
-    expect(stash).toEqual({
+    expect(finalizeStash(stash)).toEqual({
       contributors: [
         {
           id: 'contributors-test-file-generated-uid-0',
@@ -98,7 +99,7 @@ describe('validateAndStashObject', () => {
       { ...opts, file: 'folder\\my_file' },
     );
     expect(out).toEqual('contributors-my_file-generated-uid-0');
-    expect(stash).toEqual({
+    expect(finalizeStash(stash)).toEqual({
       contributors: [
         {
           id: 'contributors-my_file-generated-uid-0',
@@ -118,7 +119,7 @@ describe('validateAndStashObject', () => {
           nameParsed: { literal: 'Just A. Name', given: 'Just A.', family: 'Name' },
         },
       ],
-    };
+    } as ReferenceStash;
     const out = validateAndStashObject(
       { id: 'auth2', name: 'A. Nother Name' },
       stash,
@@ -127,7 +128,7 @@ describe('validateAndStashObject', () => {
       opts,
     );
     expect(out).toEqual('auth2');
-    expect(stash).toEqual({
+    expect(finalizeStash(stash)).toEqual({
       contributors: [
         {
           id: 'auth1',
@@ -151,7 +152,7 @@ describe('validateAndStashObject', () => {
           name: 'auth1',
         },
       ],
-    };
+    } as ReferenceStash;
     const out = validateAndStashObject(
       {
         id: 'auth1',
@@ -163,7 +164,7 @@ describe('validateAndStashObject', () => {
       opts,
     );
     expect(out).toEqual('auth1');
-    expect(stash).toEqual({
+    expect(finalizeStash(stash)).toEqual({
       contributors: [
         {
           id: 'auth1',
@@ -183,7 +184,7 @@ describe('validateAndStashObject', () => {
           nameParsed: { literal: 'Just A. Name', given: 'Just A.', family: 'Name' },
         },
       ],
-    };
+    } as ReferenceStash;
     const out = validateAndStashObject(
       {
         id: 'auth1',
@@ -195,7 +196,7 @@ describe('validateAndStashObject', () => {
       opts,
     );
     expect(out).toEqual('auth1');
-    expect(stash).toEqual({
+    expect(finalizeStash(stash)).toEqual({
       contributors: [
         {
           id: 'auth1',
@@ -205,5 +206,27 @@ describe('validateAndStashObject', () => {
       ],
     });
     expect(opts.messages.warnings?.length).toEqual(1);
+  });
+});
+
+describe('isStashPlaceholder', () => {
+  it.each([
+    [{}, false],
+    [{ name: 'name' }, false],
+    [{ id: 'name' }, false],
+    [{ name: 'name', id: 'name' }, true],
+    [{ name: 'name', id: 'id' }, false],
+    [{ name: 'name', id: 'name', extra: 'name' }, false],
+    [{ name: 'name', nameParsed: { literal: 'name', family: 'name' } }, false],
+    [{ id: 'name', nameParsed: { literal: 'name', family: 'name' } }, false],
+    [{ name: 'name', id: 'name', nameParsed: { literal: 'name' } }, true],
+    [{ name: 'name', id: 'name', nameParsed: { literal: 'name', family: 'name' } }, true],
+    [{ name: 'name', id: 'name', nameParsed: { family: 'name' } }, false],
+    [
+      { name: 'name', id: 'name', nameParsed: { literal: 'name', family: 'name' }, extra: 'name' },
+      false,
+    ],
+  ])(`%s - %s`, async (input, result) => {
+    expect(isStashPlaceholder(input as any)).toBe(result);
   });
 });

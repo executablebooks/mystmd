@@ -123,7 +123,7 @@ export function validateAffiliation(input: any, opts: ValidationOptions) {
   // If affiliation only has an id, give it a matching name; this is equivalent to the case
   // where a simple string is provided as an affiliation.
   if (Object.keys(output).length === 1 && output.id) {
-    return stashPlaceholder(output.id);
+    return stashPlaceholder(output.id) as Affiliation;
   } else if (!output.name) {
     validationWarning('affiliation should include name/institution', opts);
   }

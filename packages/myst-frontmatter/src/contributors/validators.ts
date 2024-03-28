@@ -12,12 +12,12 @@ import {
   validationError,
   validationWarning,
 } from 'simple-validators';
+import { orcid } from 'orcid';
 import { validateAffiliation } from '../affiliations/validators.js';
 import type { ReferenceStash } from '../utils/referenceStash.js';
-import { validateAndStashObject } from '../utils/referenceStash.js';
+import { stashPlaceholder, validateAndStashObject } from '../utils/referenceStash.js';
 import type { Contributor, Name } from './types.js';
 import { formatName, parseName } from '../utils/parseName.js';
-import { orcid } from 'orcid';
 
 const CONTRIBUTOR_KEYS = [
   'id',
@@ -129,7 +129,7 @@ export function validateName(input: any, opts: ValidationOptions) {
  */
 export function validateContributor(input: any, stash: ReferenceStash, opts: ValidationOptions) {
   if (typeof input === 'string') {
-    input = { id: input, name: input };
+    input = stashPlaceholder(input);
   }
   const value = validateObjectKeys(
     input,

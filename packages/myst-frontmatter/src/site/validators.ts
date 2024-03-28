@@ -11,7 +11,7 @@ import { validateAffiliation } from '../affiliations/validators.js';
 import { validateContributor } from '../contributors/validators.js';
 import { validateFunding } from '../funding/validators.js';
 import type { ReferenceStash } from '../utils/referenceStash.js';
-import { validateAndStashObject } from '../utils/referenceStash.js';
+import { finalizeStash, validateAndStashObject } from '../utils/referenceStash.js';
 import { validateGithubUrl } from '../utils/validators.js';
 import { validateVenue } from '../venues/validators.js';
 import type { SiteFrontmatter } from './types.js';
@@ -207,12 +207,11 @@ export function validateSiteFrontmatterKeys(value: Record<string, any>, opts: Va
     }
   }
 
-  // Contributor resolution should happen last
-  const stashContribAuthors = stash.contributors?.filter((contrib) =>
-    stash.authorIds?.includes(contrib.id),
-  );
-  const stashContribNonAuthors = stash.contributors?.filter(
-    (contrib) => !stash.authorIds?.includes(contrib.id),
+  // Author/Contributor/Affiliation resolution should happen last
+  const { contributors, affiliations, authorIds } = finalizeStash(stash);
+  const stashContribAuthors = contributors?.filter((contrib) => authorIds?.includes(contrib.id));
+  const stashContribNonAuthors = contributors?.filter(
+    (contrib) => !authorIds?.includes(contrib.id),
   );
   if (stashContribAuthors?.length) {
     output.authors = stashContribAuthors;
@@ -226,8 +225,8 @@ export function validateSiteFrontmatterKeys(value: Record<string, any>, opts: Va
   if (stashContribNonAuthors?.length) {
     output.contributors = stashContribNonAuthors;
   }
-  if (stash.affiliations?.length) {
-    output.affiliations = stash.affiliations;
+  if (affiliations?.length) {
+    output.affiliations = affiliations;
   }
   return output;
 }
