@@ -13,13 +13,17 @@ import {
   validationWarning,
 } from 'simple-validators';
 import { orcid } from 'orcid';
-import { validateAffiliation } from '../affiliations/validators.js';
+import {
+  AFFILIATION_ALIASES,
+  AFFILIATION_KEYS,
+  validateAffiliation,
+} from '../affiliations/validators.js';
+import { formatName, parseName } from '../utils/parseName.js';
 import type { ReferenceStash } from '../utils/referenceStash.js';
 import { stashPlaceholder, validateAndStashObject } from '../utils/referenceStash.js';
 import type { Contributor, Name } from './types.js';
-import { formatName, parseName } from '../utils/parseName.js';
 
-const CONTRIBUTOR_KEYS = [
+const PERSON_KEYS = [
   'id',
   'userId',
   'name',
@@ -39,7 +43,7 @@ const CONTRIBUTOR_KEYS = [
   'phone',
   'fax',
 ];
-const CONTRIBUTOR_ALIASES = {
+const PERSON_ALIASES = {
   role: 'roles',
   'equal-contributor': 'equal_contributor',
   affiliation: 'affiliations',
@@ -127,16 +131,34 @@ export function validateName(input: any, opts: ValidationOptions) {
 /**
  * Validate Contributor object against the schema
  */
-export function validateContributor(input: any, stash: ReferenceStash, opts: ValidationOptions) {
+export function validateContributor(
+  input: any,
+  stash: ReferenceStash,
+  opts: ValidationOptions,
+): Contributor | undefined {
+  const inputAff = validateObjectKeys(
+    input,
+    { optional: AFFILIATION_KEYS, alias: AFFILIATION_ALIASES },
+    {
+      ...opts,
+      suppressErrors: true,
+      suppressWarnings: true,
+    },
+  );
+  if (inputAff?.collaboration === true) {
+    return validateAffiliation(input, opts);
+  }
   if (typeof input === 'string') {
     input = stashPlaceholder(input);
   }
-  const value = validateObjectKeys(
-    input,
-    { optional: CONTRIBUTOR_KEYS, alias: CONTRIBUTOR_ALIASES },
-    opts,
-  );
+  const value = validateObjectKeys(input, { optional: PERSON_KEYS, alias: PERSON_ALIASES }, opts);
   if (value === undefined) return undefined;
+  if (inputAff && Object.keys(inputAff).length > Object.keys(value).length) {
+    validationWarning(
+      'contributor may be a collaboration, not a person - if so, add "collaboration: true"',
+      opts,
+    );
+  }
   const output: Contributor = {};
   if (defined(value.id)) {
     output.id = validateString(value.id, incrementOptions('id', opts));

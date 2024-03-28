@@ -296,3 +296,86 @@ cases:
             literal: John Doe
             family: Doe
             given: John
+  - title: author as collaboration passes
+    raw:
+      authors:
+        - name: Research Group
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
+    normalized:
+      authors:
+        - name: Research Group
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
+          id: contributors-generated-uid-0
+  - title: author as non-collaboration affiliation fails and suggests collab:true
+    raw:
+      authors:
+        - name: Research Group
+          department: Example department
+          isni: '0000000000000000'
+          field_a: extra
+    normalized:
+      authors:
+        - name: Research Group
+          id: contributors-generated-uid-0
+          nameParsed:
+            literal: Research Group
+            given: Research
+            family: Group
+    warnings: 2
+  - title: author with totally unknown fields fails and does not suggest collab:true
+    raw:
+      authors:
+        - name: Research Group
+          field_a: Example department
+          field_b: '0000000000000000'
+    normalized:
+      authors:
+        - name: Research Group
+          id: contributors-generated-uid-0
+          nameParsed:
+            literal: Research Group
+            given: Research
+            family: Group
+    warnings: 1
+  - title: reviewer/editor/contributor as collaboration pass
+    raw:
+      reviewers:
+        - name: Research Group One
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
+      editors:
+        - name: Research Group Two
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
+      contributors:
+        - name: Research Group Three
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
+    normalized:
+      reviewers:
+        - contributors-generated-uid-1
+      editors:
+        - contributors-generated-uid-2
+      contributors:
+        - name: Research Group Three
+          id: contributors-generated-uid-0
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
+        - name: Research Group One
+          id: contributors-generated-uid-1
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
+        - name: Research Group Two
+          id: contributors-generated-uid-2
+          collaboration: true
+          department: Example department
+          isni: '0000000000000000'
