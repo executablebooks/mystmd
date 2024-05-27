@@ -191,7 +191,7 @@ export async function localArticleToTexTemplated(
   templateOptions: ExportWithOutput,
   opts?: ExportFnOptions,
 ): Promise<ExportResults> {
-  const { output, articles, template } = templateOptions;
+  const { output, articles, template, imports } = templateOptions;
   const { projectPath, extraLinkTransformers, clean, ci } = opts ?? {};
   const filesPath = path.join(path.dirname(output), 'files');
   const fileArticles = articlesWithFile(articles);
@@ -236,6 +236,12 @@ export async function localArticleToTexTemplated(
   const partDefinitions = templateYml?.parts || [];
   const parts: Record<string, string | string[]> = {};
   let collectedImports: TexTemplateImports = { imports: [], commands: {} };
+  // First get the imports from the options
+  if (imports) {
+    imports.forEach((item) => {
+      collectedImports.imports.push(item);
+    });
+  }
   let preambleData: PreambleData = {
     hasProofs: false,
     printGlossaries: false,
