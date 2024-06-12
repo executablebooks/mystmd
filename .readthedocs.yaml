@@ -1,0 +1,13 @@
+version: 2
+build:
+  os: ubuntu-lts-latest
+  tools:
+    nodejs: "20"
+  commands:
+    - npm install
+    - npm run build
+    - npm run --workspace packages/mystmd link
+    - myst --version
+    - cd docs && myst build --html
+    - mkdir -p $READTHEDOCS_OUTPUT
+    - cp -a docs/_build/* $READTHEDOCS_OUTPUT/
