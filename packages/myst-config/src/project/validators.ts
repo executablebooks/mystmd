@@ -43,27 +43,27 @@ export function validatePluginInfo(input: any, opts: ValidationOptions): PluginI
   return { type, path };
 }
 
-function validateProjectConfigKeys(value: Record<string, any>, opts: ValidationOptions) {
-  const output: ProjectConfig = validateProjectFrontmatterKeys(value, opts);
-  if (defined(value.remote)) {
-    output.remote = validateString(value.remote, incrementOptions('remote', opts));
+function validateProjectConfigKeys(input: Record<string, any>, opts: ValidationOptions) {
+  const output: ProjectConfig = validateProjectFrontmatterKeys(input, opts);
+  if (defined(input.remote)) {
+    output.remote = validateString(input.remote, incrementOptions('remote', opts));
   }
-  if (defined(value.index)) {
+  if (defined(input.index)) {
     // TODO: Warn if these files don't exist
-    output.index = validateString(value.index, incrementOptions('index', opts));
+    output.index = validateString(input.index, incrementOptions('index', opts));
   }
-  if (defined(value.exclude)) {
+  if (defined(input.exclude)) {
     output.exclude = validateList(
-      value.exclude,
+      input.exclude,
       { coerce: true, ...incrementOptions('exclude', opts) },
       (value, index: number) => {
         return validateString(value, incrementOptions(`exclude.${index}`, opts));
       },
     );
   }
-  if (defined(value.plugins)) {
+  if (defined(input.plugins)) {
     output.plugins = validateList(
-      value.plugins,
+      input.plugins,
       incrementOptions('plugins', opts),
       (file, index: number) => {
         return validatePluginInfo(file, incrementOptions(`plugins.${index}`, opts));
@@ -71,8 +71,8 @@ function validateProjectConfigKeys(value: Record<string, any>, opts: ValidationO
     );
   }
 
-  if (defined(value.error_rules)) {
-    const error_rules = validateErrorRuleList(value.error_rules, opts);
+  if (defined(input.error_rules)) {
+    const error_rules = validateErrorRuleList(input.error_rules, opts);
     if (error_rules) output.error_rules = error_rules;
   }
   return output;

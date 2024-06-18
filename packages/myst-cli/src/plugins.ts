@@ -12,24 +12,22 @@ import { loadExecutablePlugin } from './executablePlugin.js';
  * @param session session with logging
  */
 export async function loadPlugins(session: ISession): Promise<MystPlugin> {
-  let rawConfigPlugins: PluginInfo[] = [];
+  let configPlugins: PluginInfo[] = [];
   const state = session.store.getState();
   const projConfig = selectors.selectCurrentProjectConfig(state);
-  if (projConfig?.plugins) rawConfigPlugins.push(...projConfig.plugins);
+  if (projConfig?.plugins) configPlugins.push(...projConfig.plugins);
   const siteConfig = selectors.selectCurrentSiteConfig(state);
   if (siteConfig?.projects) {
     siteConfig.projects
       .filter((project): project is { path: string } => !!project.path)
       .forEach((project) => {
         const siteProjConfig = selectors.selectLocalProjectConfig(state, project.path);
-        if (siteProjConfig?.plugins) rawConfigPlugins.push(...siteProjConfig.plugins);
+        if (siteProjConfig?.plugins) configPlugins.push(...siteProjConfig.plugins);
       });
   }
 
   // Deduplicate by path
-  const configPlugins: PluginInfo[] = [
-    ...new Map(rawConfigPlugins.map((info) => [info.path, info])).values(),
-  ];
+  configPlugins = [...new Map(configPlugins.map((info) => [info.path, info])).values()];
 
   const plugins: MystPlugin = {
     directives: [],
@@ -46,7 +44,7 @@ export async function loadPlugins(session: ISession): Promise<MystPlugin> {
     configPlugins.map(async (info) => {
       const { type, path } = info;
       switch (type) {
-        case 'executable':
+        case 'executable': {
           // Ensure the plugin is a file
           if (!fs.statSync(path).isFile) {
             addWarningForFile(
@@ -84,7 +82,8 @@ export async function loadPlugins(session: ISession): Promise<MystPlugin> {
             return null;
           }
           return { path, module: { plugin } };
-        case 'javascript':
+        }
+        case 'javascript': {
           if (!fs.statSync(path).isFile || !path.endsWith('.mjs')) {
             addWarningForFile(
               session,
@@ -108,6 +107,7 @@ export async function loadPlugins(session: ISession): Promise<MystPlugin> {
             return null;
           }
           return { path, module };
+        }
       }
     }),
   );
