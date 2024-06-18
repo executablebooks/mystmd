@@ -51,6 +51,12 @@ project:
     - unsplash.mjs
     - latex.mjs
     - templates.mjs
+    - type: executable
+      path: unsplash.py
+    - type: executable
+      path: markup.py
+    - type: javascript
+      path: markup.mjs
   error_rules:
     - rule: link-resolves
       severity: ignore
@@ -63,7 +69,7 @@ project:
         - /jtex/create-a-beamer-template
         - /jtex/contribute-a-template
   toc:
-    - file: index
+    - file: index.md
     - title: Quickstart Tutorials
       children:
         - file: quickstart.md
@@ -122,8 +128,10 @@ project:
         - file: creating-word-documents.md
         - file: creating-jats-xml.md
     - title: Extensions
+      file: plugins.md
       children:
-        - file: plugins.md
+        - file: javascript-plugins.md
+        - file: executable-plugins.md
     - title: Reference
       children:
         - file: background.md
