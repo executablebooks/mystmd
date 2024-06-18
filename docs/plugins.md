@@ -38,7 +38,7 @@ renderers
 
 ## Building a Plugin
 
-There are two ways to implement a plugin in MyST
+There are two ways to implement a plugin in MyST: JavaScript plugins, and executable plugins. The easiest way to get started in writing a custom plugin is to build a [JavaScript plugin](./javascript-plugins.md), but writing an executable plugin might be a better choice if you unfamiliar with JavaScript but are confident in a non-JS language e.g. Python.
 
 :::{card} JavaScript Plugins
 :link: ./javascript-plugins.md
