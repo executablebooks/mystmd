@@ -10,14 +10,38 @@ import {
   validateObjectKeys,
   validateString,
   validateList,
+  validateEnum,
 } from 'simple-validators';
 import { validateErrorRuleList } from '../errorRules/validators.js';
-import type { ProjectConfig } from './types.js';
+import { type ProjectConfig, type PluginInfo, PluginTypes } from './types.js';
 
 const PROJECT_CONFIG_KEYS = {
   optional: ['remote', 'index', 'exclude', 'plugins', 'error_rules', ...PROJECT_FRONTMATTER_KEYS],
   alias: FRONTMATTER_ALIASES,
 };
+
+export function validatePluginInfo(input: any, opts: ValidationOptions): PluginInfo | undefined {
+  if (typeof input === 'string') {
+    input = { type: PluginTypes.javascript, path: input };
+  }
+  const value = validateObjectKeys(input, { required: ['type', 'path'] }, opts);
+  if (value === undefined) {
+    return undefined;
+  }
+  const path = validateString(value.path, incrementOptions('path', opts));
+  if (path === undefined) {
+    return undefined;
+  }
+  const type = validateEnum<PluginTypes>(value.type, {
+    ...incrementOptions('type', opts),
+    enum: PluginTypes,
+  });
+  if (type === undefined) {
+    return undefined;
+  }
+
+  return { type, path };
+}
 
 function validateProjectConfigKeys(value: Record<string, any>, opts: ValidationOptions) {
   const output: ProjectConfig = validateProjectFrontmatterKeys(value, opts);
@@ -32,8 +56,8 @@ function validateProjectConfigKeys(value: Record<string, any>, opts: ValidationO
     output.exclude = validateList(
       value.exclude,
       { coerce: true, ...incrementOptions('exclude', opts) },
-      (file, index: number) => {
-        return validateString(file, incrementOptions(`exclude.${index}`, opts));
+      (value, index: number) => {
+        return validateString(value, incrementOptions(`exclude.${index}`, opts));
       },
     );
   }
@@ -42,7 +66,7 @@ function validateProjectConfigKeys(value: Record<string, any>, opts: ValidationO
       value.plugins,
       incrementOptions('plugins', opts),
       (file, index: number) => {
-        return validateString(file, incrementOptions(`plugins.${index}`, opts));
+        return validatePluginInfo(file, incrementOptions(`plugins.${index}`, opts));
       },
     );
   }
