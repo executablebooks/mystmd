@@ -4,7 +4,6 @@
   "description": "Command line tools for MyST Markdown",
   "author": "Rowan Cockett <rowan@curvenote.com>",
   "license": "MIT",
-  "type": "module",
   "keywords": [
     "markdown",
     "latex",
@@ -37,13 +36,14 @@
     "lint:format": "npm run copy:version; prettier --check \"src/**/*.ts\"",
     "test": "npm run link; npm run copy:version; vitest run",
     "test:watch": "npm run link; npm run copy:version; vitest watch",
-    "build:cli": "esbuild src/index.ts --bundle --outfile=dist/myst.cjs --platform=node --external:fsevents --target=node14",
+    "build:cli": "./esbuild.mjs",
     "build": "npm-run-all -l clean copy:version -p build:cli"
   },
   "devDependencies": {
     "chalk": "^5.2.0",
     "commander": "^10.0.1",
     "core-js": "^3.31.1",
+    "esbuild-copy-files-plugin": "^1.2.0",
     "js-yaml": "^4.1.0",
     "myst-cli": "^1.2.8"
   }

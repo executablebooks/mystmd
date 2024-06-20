@@ -1,8 +1,78 @@
 import fs from 'node:fs';
+import { parse } from 'node:path';
 import type { ISession } from './session/types.js';
 import { selectors } from './store/index.js';
-import { RuleId, plural, type MystPlugin } from 'myst-common';
+import {
+  RuleId,
+  plural,
+  type MystPlugin,
+  type DirectiveSpec,
+  type RoleSpec,
+  type TransformSpec,
+} from 'myst-common';
 import { addWarningForFile } from './utils/addWarningForFile.js';
+import { loadPyodide } from 'pyodide';
+
+function moveToJS(result: any): any {
+  const value = result.toJs({ create_pyproxies: false, dict_converter: Object.fromEntries });
+  result.destroy();
+  return value;
+}
+
+function maybeMoveToJS(result: any) : any {
+   return "toJs" in result ? moveToJS(result) : result;
+}
+
+function wrapPythonDirective(directive: any): DirectiveSpec {
+  return {
+    ...directive.toJs(),
+    validate:
+      directive.get('validate') &&
+      ((data: any, vfile: any) => directive.get('validate').callRelaxed(data, vfile).toJs()),
+    run: (data: any, vfile: any, ctx: any) =>
+      moveToJS(directive.get('run').callRelaxed(data, vfile, ctx)),
+  } as any as DirectiveSpec;
+}
+function wrapPythonRole(role: any): RoleSpec {
+  return {
+    ...role.toJs(),
+    validate:
+      role.get('validate') &&
+      ((data: any, vfile: any) => role.get('validate').callRelaxed(data, vfile).toJs()),
+    run: (data: any, vfile: any) => moveToJS(role.get('run').callRelaxed(data, vfile)),
+  } as any as RoleSpec;
+}
+function wrapPythonTransform(transform: any): TransformSpec {
+  return {
+    ...transform.toJs(),
+    plugin: (opts: any, utils: any) => {
+      const closure = transform.get('plugin').callRelaxed(opts, utils);
+
+      return (node: any) => {
+        const result = maybeMoveToJS(closure.callRelaxed(node));
+        closure.destroy();
+        return result;
+      };
+    },
+  } as any as TransformSpec;
+}
+
+function proxyPythonModule(pyodide: any): { plugin: MystPlugin } | undefined {
+  const plugin = pyodide.globals.get('plugin');
+  if (!plugin) {
+    return undefined;
+  }
+  return {
+    plugin: {
+      name: plugin.get('name'),
+      author: plugin.get('author'),
+      license: plugin.get('license'),
+      directives: (plugin.get('directives') || []).map(wrapPythonDirective),
+      roles: (plugin.get('roles') || []).map(wrapPythonRole),
+      transforms: (plugin.get('transforms') || []).map(wrapPythonTransform),
+    },
+  };
+}
 
 /**
  * Load user-defined plugin modules declared in the project frontmatter
@@ -35,11 +105,12 @@ export async function loadPlugins(session: ISession): Promise<MystPlugin> {
   session.log.debug(`Loading plugins: "${configPlugins.join('", "')}"`);
   const modules = await Promise.all(
     configPlugins.map(async (filename) => {
-      if (!fs.statSync(filename).isFile || !filename.endsWith('.mjs')) {
+      const { ext } = parse(filename);
+      if (!fs.statSync(filename).isFile || !(ext === '.mjs' || ext === '.py')) {
         addWarningForFile(
           session,
           filename,
-          `Unknown plugin "${filename}", it must be an mjs file`,
+          `Unknown plugin "${filename}", it must be a .mjs or .py file`,
           'error',
           {
             ruleId: RuleId.pluginLoads,
@@ -48,16 +119,29 @@ export async function loadPlugins(session: ISession): Promise<MystPlugin> {
         return null;
       }
       let module: any;
-      try {
-        module = await import(filename);
-      } catch (error) {
-        session.log.debug(`\n\n${(error as Error)?.stack}\n\n`);
-        addWarningForFile(session, filename, `Error reading plugin: ${error}`, 'error', {
-          ruleId: RuleId.pluginLoads,
-        });
-        return null;
+      switch (ext) {
+        case '.mjs':
+          try {
+            module = await import(filename);
+          } catch (error) {
+            session.log.debug(`\n\n${(error as Error)?.stack}\n\n`);
+            addWarningForFile(session, filename, `Error reading plugin: ${error}`, 'error', {
+              ruleId: RuleId.pluginLoads,
+            });
+            return null;
+          }
+          return { filename, module };
+        case '.py':
+          const pyodide = await loadPyodide({
+            stdout: (msg) => session.log.debug(`stdout from Python plugin: ${msg}`),
+            stderr: (msg) => session.log.error(`stderr from Python plugin: ${msg}`),
+          });
+          const scriptBody = await fs.promises.readFile(filename, { encoding: 'utf-8' });
+          await pyodide.runPythonAsync(scriptBody);
+          return { filename, module: proxyPythonModule(pyodide), pyodide };
+        default:
+          throw new Error('unexpected code path');
       }
-      return { filename, module };
     }),
   );
   modules.forEach((pluginLoader) => {
