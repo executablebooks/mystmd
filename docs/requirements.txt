@@ -2,6 +2,7 @@ altair
 ipykernel
 jupyter
 pandas
+plotly_express
 matplotlib
 numpy
 vega_datasets
