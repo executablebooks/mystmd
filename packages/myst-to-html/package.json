@@ -1,6 +1,6 @@
 {
   "name": "myst-to-html",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "description": "Export from MyST mdast to HTML",
   "author": "Franklin Koch <franklin@curvenote.com>",
   "homepage": "https://github.com/executablebooks/mystmd/tree/main/packages/myst-to-html",

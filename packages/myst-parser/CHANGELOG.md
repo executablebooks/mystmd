@@ -1,5 +1,14 @@
 # myst-parser
 
+## 1.5.0
+
+### Patch Changes
+
+- 8e486e5: Ignore 'dot' top level domain.
+- Updated dependencies [d04ceb6a]
+  - myst-directives@1.5.0
+  - myst-roles@1.5.0
+
 ## 1.4.4
 
 ### Patch Changes
