@@ -1,5 +1,11 @@
 # myst-directives
 
+## 1.5.0
+
+### Minor Changes
+
+- d04ceb6a: Drop `output` directive
+
 ## 1.4.4
 
 ### Patch Changes
