@@ -18,6 +18,7 @@ import {
   makeExportsOption,
   makeTemplatesOption,
 } from './options.js';
+import { readableName } from '../utils/whiteLabelling.js';
 
 export function makeCleanCommand() {
   const command = new Command('clean')
@@ -30,7 +31,7 @@ export function makeCleanCommand() {
     .addOption(makeMdOption('Clean MD output'))
     .addOption(makeJatsOption('Clean JATS xml output'))
     .addOption(makeMecaOptions('Clean MECA zip output'))
-    .addOption(makeSiteOption('Clean MyST site content'))
+    .addOption(makeSiteOption(`Clean ${readableName()} site content`))
     .addOption(makeHtmlOption('Clean static HTML site content'))
     .addOption(makeExecuteOption('Clean execute cache'))
     .addOption(makeTempOption())
@@ -39,7 +40,7 @@ export function makeCleanCommand() {
     .addOption(makeExportsOption())
     .addOption(makeTemplatesOption())
     .addOption(
-      makeAllOption('Delete all exports, site content, templates, and temp files created by MyST'),
+      makeAllOption(`Delete all exports, site content, templates, and temp files created by ${readableName()}`),
     )
     .addOption(makeYesOption());
   return command;
