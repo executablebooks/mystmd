@@ -40,7 +40,9 @@ export function makeCleanCommand() {
     .addOption(makeExportsOption())
     .addOption(makeTemplatesOption())
     .addOption(
-      makeAllOption(`Delete all exports, site content, templates, and temp files created by ${readableName()}`),
+      makeAllOption(
+        `Delete all exports, site content, templates, and temp files created by ${readableName()}`,
+      ),
     )
     .addOption(makeYesOption());
   return command;

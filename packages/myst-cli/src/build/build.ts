@@ -270,7 +270,9 @@ export async function build(session: ISession, files: string[], opts: BuildOpts)
     } else {
       session.log.info(`🌎 Building ${readableName()} site`);
       if (watch) {
-        session.log.warn(`Site content will not be watched and updated; use '${binaryName()} start' instead`);
+        session.log.warn(
+          `Site content will not be watched and updated; use '${binaryName()} start' instead`,
+        );
       }
       if (opts.html) {
         buildLog.buildHtml = true;

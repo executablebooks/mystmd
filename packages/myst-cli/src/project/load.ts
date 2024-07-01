@@ -80,7 +80,9 @@ export async function loadProjectFromDisk(
       // Do not warn if user is explicitly upgrading toc
       // TODO: Add this back as a warning rather than debug as we surface this feature more
       session.log.debug(`Encountered legacy Jupyter Book TOC: ${sphinxTOCFile}`);
-      session.log.debug(`To upgrade to a ${readableName()} TOC, try running \`${binaryName()} init --write-toc\``);
+      session.log.debug(
+        `To upgrade to a ${readableName()} TOC, try running \`${binaryName()} init --write-toc\``,
+      );
       // addWarningForFile(
       //   session,
       //   filename,
@@ -106,7 +108,9 @@ export async function loadProjectFromDisk(
   }
   if (writeTOC) {
     if (legacyToc) {
-      session.log.info(`⬆️ Upgrading legacy Jupyter Book TOC to ${readableName()}: ${tocFile(path)}`);
+      session.log.info(
+        `⬆️ Upgrading legacy Jupyter Book TOC to ${readableName()}: ${tocFile(path)}`,
+      );
     }
     session.log.info(`💾 Writing new TOC to: ${projectConfigFile}`);
     await writeTOCToConfigFile(newProject, projectConfigFile, projectConfigFile);

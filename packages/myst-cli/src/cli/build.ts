@@ -22,7 +22,6 @@ import {
 } from './options.js';
 import { readableName } from '../utils/whiteLabelling.js';
 
-
 export function makeBuildCommand() {
   const command = new Command('build')
     .description('Build PDF, LaTeX, Word and website exports from MyST files')
