@@ -13,7 +13,7 @@ import { githubCurvenoteAction, githubPagesAction } from './gh-actions/index.js'
 import { getGithubUrl } from './utils/github.js';
 import { checkFolderIsGit } from './utils/git.js';
 const VERSION_CONFIG = '# See docs at: https://mystmd.org/guide/frontmatter\nversion: 1\n';
-import { binaryName, helpURL, readableName } from '../utils/whiteLabelling.js';
+import { binaryName, homeURL, readableName } from '../utils/whiteLabelling.js';
 
 function createProjectConfig({ github }: { github?: string } = {}) {
   return `project:
@@ -54,7 +54,7 @@ You can use ${readableName()} to:
  - create interactive ${chalk.bold.magenta('websites')} from markdown and Jupyter Notebooks 📈
  - ${chalk.bold.magenta('build & export')} professional PDFs and Word documents 📄
 
-Learn more about this CLI and MyST Markdown at: ${chalk.bold(helpURL())}
+Learn more about this CLI and MyST Markdown at: ${chalk.bold(homeURL())}
 
 `;
 
