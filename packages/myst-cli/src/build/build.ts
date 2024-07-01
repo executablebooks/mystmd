@@ -15,6 +15,7 @@ import { localArticleExport } from './utils/localArticleExport.js';
 import type { CollectionOptions } from './utils/collectExportOptions.js';
 import { collectExportOptions, resolveExportListArticles } from './utils/collectExportOptions.js';
 import { buildHtml } from './html/index.js';
+import { binaryName, readableName } from '../utils/whiteLabelling.js';
 
 type FormatBuildOpts = {
   /** Options to decide what to build */
@@ -252,7 +253,7 @@ export async function build(session: ISession, files: string[], opts: BuildOpts)
       } else {
         session.log.info(
           chalk.dim(
-            'You may need to specify either:\n  - an export format, e.g. `myst build --pdf`\n  - a file to export, e.g. `myst build my-file.md`',
+            `You may need to specify either:\n  - an export format, e.g. \`${binaryName()} build --pdf\`\n  - a file to export, e.g. \`${binaryName()} build my-file.md\``,
           ),
         );
       }
@@ -265,11 +266,13 @@ export async function build(session: ISession, files: string[], opts: BuildOpts)
     const siteConfig = selectors.selectCurrentSiteConfig(session.store.getState());
     if (!siteConfig) {
       session.log.info('🌎 No site configuration found.');
-      session.log.debug(`To build a site, first run 'myst init --site'`);
+      session.log.debug(`To build a site, first run '${binaryName()} init --site'`);
     } else {
-      session.log.info(`🌎 Building MyST site`);
+      session.log.info(`🌎 Building ${readableName()} site`);
       if (watch) {
-        session.log.warn(`Site content will not be watched and updated; use 'myst start' instead`);
+        session.log.warn(
+          `Site content will not be watched and updated; use '${binaryName()} start' instead`,
+        );
       }
       if (opts.html) {
         buildLog.buildHtml = true;

@@ -16,6 +16,8 @@ import { projectFromPath } from './fromPath.js';
 import { projectFromTOC, projectFromSphinxTOC, getIgnoreFiles } from './fromTOC.js';
 import type { LocalProject, LocalProjectPage } from './types.js';
 import { writeTOCToConfigFile } from './toTOC.js';
+import { binaryName, readableName } from '../utils/whiteLabelling.js';
+
 /**
  * Load project structure from disk
  *
@@ -47,7 +49,7 @@ export async function loadProjectFromDisk(
     addWarningForFile(
       session,
       projectConfigFile,
-      `Loading project from path with no config file: ${path}\nConsider running "myst init --project" in that directory`,
+      `Loading project from path with no config file: ${path}\nConsider running "${binaryName()} init --project" in that directory`,
       'warn',
       { ruleId: RuleId.projectConfigExists },
     );
@@ -62,7 +64,7 @@ export async function loadProjectFromDisk(
       addWarningForFile(
         session,
         sphinxTOCFile,
-        `Ignoring legacy jupyterbook TOC in favor of myst.yml TOC: ${sphinxTOCFile}`,
+        `Ignoring legacy Jupyter Book TOC in favor of myst.yml TOC: ${sphinxTOCFile}`,
         'warn',
         {
           ruleId: RuleId.encounteredLegacyTOC,
@@ -77,8 +79,10 @@ export async function loadProjectFromDisk(
     if (!writeTOC) {
       // Do not warn if user is explicitly upgrading toc
       // TODO: Add this back as a warning rather than debug as we surface this feature more
-      session.log.debug(`Encountered legacy jupyterbook TOC: ${sphinxTOCFile}`);
-      session.log.debug('To upgrade to a MyST TOC, try running `myst init --write-toc`');
+      session.log.debug(`Encountered legacy Jupyter Book TOC: ${sphinxTOCFile}`);
+      session.log.debug(
+        `To upgrade to a ${readableName()} TOC, try running \`${binaryName()} init --write-toc\``,
+      );
       // addWarningForFile(
       //   session,
       //   filename,
@@ -104,7 +108,9 @@ export async function loadProjectFromDisk(
   }
   if (writeTOC) {
     if (legacyToc) {
-      session.log.info(`⬆️ Upgrading legacy jupyterbook TOC to MyST: ${tocFile(path)}`);
+      session.log.info(
+        `⬆️ Upgrading legacy Jupyter Book TOC to ${readableName()}: ${tocFile(path)}`,
+      );
     }
     session.log.info(`💾 Writing new TOC to: ${projectConfigFile}`);
     await writeTOCToConfigFile(newProject, projectConfigFile, projectConfigFile);

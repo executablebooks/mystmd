@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
-import { Session, init, makeSiteOption } from 'myst-cli';
+import { Session, init, makeSiteOption, readableName } from 'myst-cli';
 import { clirun } from './clirun.js';
 import {
   makeProjectOption,
@@ -11,9 +11,9 @@ import {
 
 export function makeInitCLI(program: Command) {
   const command = new Command('init')
-    .description('Initialize a MyST project in the current directory')
-    .addOption(makeProjectOption('Initialize config for MyST project content'))
-    .addOption(makeSiteOption('Initialize config for MyST site'))
+    .description(`Initialize a ${readableName()} project in the current directory`)
+    .addOption(makeProjectOption(`Initialize config for ${readableName()} project content`))
+    .addOption(makeSiteOption(`Initialize config for ${readableName()} site`))
     .addOption(makeWriteTOCOption())
     .addOption(makeGithubPagesOption())
     .addOption(makeGithubCurvenoteOption())
