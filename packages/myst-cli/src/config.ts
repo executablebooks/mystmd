@@ -384,10 +384,15 @@ async function resolveProjectConfigPaths(
   }
   if (projectConfig.plugins) {
     resolvedFields.plugins = await Promise.all(
-      projectConfig.plugins.map(async (file) => {
-        const resolved = await resolutionFn(session, path, file);
-        if (fs.existsSync(resolved)) return resolved;
-        return file;
+      projectConfig.plugins.map(async (info) => {
+        const resolved = await resolutionFn(session, path, info.path, {
+          allowRemote: info.type !== 'executable',
+        });
+        if (fs.existsSync(resolved)) {
+          return { ...info, path: resolved };
+        } else {
+          return info;
+        }
       }),
     );
   }

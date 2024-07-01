@@ -10,45 +10,69 @@ import {
   validateObjectKeys,
   validateString,
   validateList,
+  validateEnum,
 } from 'simple-validators';
 import { validateErrorRuleList } from '../errorRules/validators.js';
-import type { ProjectConfig } from './types.js';
+import { type ProjectConfig, type PluginInfo, PluginTypes } from './types.js';
 
 const PROJECT_CONFIG_KEYS = {
   optional: ['remote', 'index', 'exclude', 'plugins', 'error_rules', ...PROJECT_FRONTMATTER_KEYS],
   alias: FRONTMATTER_ALIASES,
 };
 
-function validateProjectConfigKeys(value: Record<string, any>, opts: ValidationOptions) {
-  const output: ProjectConfig = validateProjectFrontmatterKeys(value, opts);
-  if (defined(value.remote)) {
-    output.remote = validateString(value.remote, incrementOptions('remote', opts));
+export function validatePluginInfo(input: any, opts: ValidationOptions): PluginInfo | undefined {
+  if (typeof input === 'string') {
+    input = { type: PluginTypes.javascript, path: input };
   }
-  if (defined(value.index)) {
+  const value = validateObjectKeys(input, { required: ['type', 'path'] }, opts);
+  if (value === undefined) {
+    return undefined;
+  }
+  const path = validateString(value.path, incrementOptions('path', opts));
+  if (path === undefined) {
+    return undefined;
+  }
+  const type = validateEnum<PluginTypes>(value.type, {
+    ...incrementOptions('type', opts),
+    enum: PluginTypes,
+  });
+  if (type === undefined) {
+    return undefined;
+  }
+
+  return { type, path };
+}
+
+function validateProjectConfigKeys(input: Record<string, any>, opts: ValidationOptions) {
+  const output: ProjectConfig = validateProjectFrontmatterKeys(input, opts);
+  if (defined(input.remote)) {
+    output.remote = validateString(input.remote, incrementOptions('remote', opts));
+  }
+  if (defined(input.index)) {
     // TODO: Warn if these files don't exist
-    output.index = validateString(value.index, incrementOptions('index', opts));
+    output.index = validateString(input.index, incrementOptions('index', opts));
   }
-  if (defined(value.exclude)) {
+  if (defined(input.exclude)) {
     output.exclude = validateList(
-      value.exclude,
+      input.exclude,
       { coerce: true, ...incrementOptions('exclude', opts) },
-      (file, index: number) => {
-        return validateString(file, incrementOptions(`exclude.${index}`, opts));
+      (value, index: number) => {
+        return validateString(value, incrementOptions(`exclude.${index}`, opts));
       },
     );
   }
-  if (defined(value.plugins)) {
+  if (defined(input.plugins)) {
     output.plugins = validateList(
-      value.plugins,
+      input.plugins,
       incrementOptions('plugins', opts),
       (file, index: number) => {
-        return validateString(file, incrementOptions(`plugins.${index}`, opts));
+        return validatePluginInfo(file, incrementOptions(`plugins.${index}`, opts));
       },
     );
   }
 
-  if (defined(value.error_rules)) {
-    const error_rules = validateErrorRuleList(value.error_rules, opts);
+  if (defined(input.error_rules)) {
+    const error_rules = validateErrorRuleList(input.error_rules, opts);
     if (error_rules) output.error_rules = error_rules;
   }
   return output;

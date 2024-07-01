@@ -100,6 +100,7 @@ export enum RuleId {
   staticActionFileCopied = 'static-action-file-copied',
   // Plugins
   pluginLoads = 'plugin-loads',
+  pluginExecutionFailed = 'plugin-execution-failed',
   // Container rules
   containerChildrenValid = 'container-children-valid',
 }
