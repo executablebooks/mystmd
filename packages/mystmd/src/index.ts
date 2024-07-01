@@ -7,9 +7,15 @@ import { makeCleanCLI } from './clean.js';
 import { makeInitCLI, addDefaultCommand } from './init.js';
 import { makeStartCLI } from './site.js';
 import { makeTemplatesCLI } from './templates.js';
-import { readableName } from 'myst-cli';
+import { readableName, isWhiteLabelled } from 'myst-cli';
 
 const program = new Command();
+
+if (isWhiteLabelled()) {
+  program.description(
+    `${readableName()} is powered by MyST-MD. See https://mystmd.org for more information.`,
+  );
+}
 
 program.addCommand(makeInitCLI(program));
 program.addCommand(makeBuildCLI(program));
