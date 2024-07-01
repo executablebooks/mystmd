@@ -1,7 +1,7 @@
 export function readableName(): string {
   if ('MYSTMD_READABLE_NAME' in process.env) {
-    const readableName = process.env.MYSTMD_READABLE_NAME as string;
-    return `${readableName} (via myst)`;
+    const name = process.env.MYSTMD_READABLE_NAME as string;
+    return `${name} (via myst)`;
   } else {
     return 'myst';
   }
