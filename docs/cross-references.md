@@ -152,11 +152,15 @@ For example, in this reference syntax:
 ```
 
 The text `my-targets-label` is the label for the target.
-There are many ways that you can label a target, and the sections below describe the most common approaches.
+There are many ways that you can label a target, and the sections below describe the most common approaches. 
+
+:::{note}
+To be referenced, targets must have a `label`/`identifier` pair [in the AST](xref:spec#association).
+:::
 
 ### Directive Targets
 
-Targets are custom anchors that you can refer to elsewhere, for example, a figure, section, table, program, or proof. To be referenced, they must have a `label`/`identifier` pair [in the AST](xref:spec#association). These can be created by setting the `label` option in many directives. For example, to label and reference a figure, use the following syntax:
+Labels can be given to most directives by setting the `label` option. For example, to label and reference a figure, use the following syntax:
 
 ````{myst}
 ```{figure} https://github.com/rowanc1/pics/blob/main/mountains.png?raw=true
@@ -172,6 +176,17 @@ Check out [](#my-fig)!!
 ```{tip} Using Markdown Links 🔗
 You can use this syntax to also reference [Section/Header targets](#targeting-headers) as well as [label equations](#targeting-equations) when using [dollar math](#dollar-math) or [AMS math](#ams-environments).
 ```
+
+Or, to label an equation:
+(example-equation-targets)=
+````{myst}
+```{math}
+:label: my-math-label
+e=mc^2
+```
+
+See [](#my-math-label) for an equation!
+````
 
 (targeting-headers)=
 
@@ -234,26 +249,6 @@ numbering:
 * [](#my-section)
 * [](#my-section2)
 ```
-
-(targeting-equations)=
-
-### Equations Targets
-
-To reference equations, use the {myst:role}`eq` role. It will automatically insert the number of the equation. Note that you cannot modify the text of equation links.
-
-(example-equation-targets)=
-
-````{myst}
-```{math}
-:label: my-math-label
-e=mc^2
-```
-
-See [](#my-math-label) for an equation!
-````
-
-% Internal/external links
-% Checking for missing references, link to another place.
 
 (targeting-cells)=
 
