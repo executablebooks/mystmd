@@ -1,5 +1,5 @@
-import fs from 'node:fs';
 import { makeExecutable } from 'myst-cli-utils';
+import { fsExists } from './fsExists.js';
 
 export async function checkFolderIsGit(): Promise<boolean> {
   try {
@@ -11,10 +11,5 @@ export async function checkFolderIsGit(): Promise<boolean> {
 }
 
 export async function checkAtGitRoot(): Promise<boolean> {
-  try {
-    fs.readdirSync('.git');
-    return true;
-  } catch (error) {
-    return false;
-  }
+  return await fsExists('.git');
 }

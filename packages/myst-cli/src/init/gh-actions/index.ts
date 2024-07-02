@@ -4,8 +4,8 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import type { ISession } from 'myst-cli-utils';
 import { writeFileToFolder } from 'myst-cli-utils';
-import { getGithubUrl } from '../utils/github.js';
-import { checkFolderIsGit, checkAtGitRoot } from '../utils/git.js';
+import { getGithubUrl } from '../../utils/github.js';
+import { checkFolderIsGit, checkAtGitRoot } from '../../utils/git.js';
 
 function createGithubPagesAction({
   defaultBranch = 'main',

@@ -1,7 +1,6 @@
 export * from './build.js';
 export * from './clean.js';
 export * from './docx/index.js';
-export * from './init.js';
 export * from './pdf/index.js';
 export * from './site/index.js';
 export * from './tex/index.js';

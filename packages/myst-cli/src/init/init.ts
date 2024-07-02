@@ -2,16 +2,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
 import { v4 as uuid } from 'uuid';
+import inquirer from 'inquirer';
+import chalk from 'chalk';
 import { defaultConfigFile, loadConfig, writeConfigs } from '../config.js';
 import { loadProjectFromDisk } from '../project/load.js';
 import { selectors } from '../store/index.js';
 import type { ISession } from '../session/types.js';
-import inquirer from 'inquirer';
-import chalk from 'chalk';
-import { startServer } from './site/start.js';
+import { startServer } from '../build/site/start.js';
 import { githubCurvenoteAction, githubPagesAction } from './gh-actions/index.js';
-import { getGithubUrl } from './utils/github.js';
-import { checkFolderIsGit } from './utils/git.js';
+import { getGithubUrl } from '../utils/github.js';
+import { checkFolderIsGit } from '../utils/git.js';
+import { upgradeJupyterBook } from './jupyter-book/upgrade.js';
+import { fsExists } from '../utils/fsExists.js';
+
 const VERSION_CONFIG = '# See docs at: https://mystmd.org/guide/frontmatter\nversion: 1\n';
 
 function createProjectConfig({ github }: { github?: string } = {}) {
@@ -127,24 +130,35 @@ export async function init(session: ISession, opts: InitOptions) {
       await writeConfigs(session, '.', { siteConfig, projectConfig });
     }
   } else {
-    // If no config is present, write it explicitly to include comments.
-    const configFile = defaultConfigFile(session, '.');
-    let configData: string;
-    let configDoc: string;
-    if (site && !project) {
-      configData = `${VERSION_CONFIG}${SITE_CONFIG}`;
-      configDoc = 'site';
-    } else if (project && !site) {
-      configData = `${VERSION_CONFIG}${createProjectConfig({ github })}`;
-      configDoc = 'project';
-    } else {
-      configData = `${VERSION_CONFIG}${createProjectConfig({ github })}${SITE_CONFIG}`;
-      configDoc = 'project and site';
+    // Is this a Jupyter Book?
+    if (await fsExists('_config.yml')) {
+      const configFile = defaultConfigFile(session, '.');
+      session.log.info(
+        `📘 Found a legacy Jupyter Book, writing new config file: ${chalk.blue(path.resolve(configFile))}`,
+      );
+      await upgradeJupyterBook(session, configFile);
     }
-    session.log.info(
-      `💾 Writing new ${configDoc} config file: ${chalk.blue(path.resolve(configFile))}`,
-    );
-    fs.writeFileSync(configFile, configData);
+    // Otherwise, write some default configs
+    else {
+      // If no config is present, write it explicitly to include comments.
+      const configFile = defaultConfigFile(session, '.');
+      let configData: string;
+      let configDoc: string;
+      if (site && !project) {
+        configData = `${VERSION_CONFIG}${SITE_CONFIG}`;
+        configDoc = 'site';
+      } else if (project && !site) {
+        configData = `${VERSION_CONFIG}${createProjectConfig({ github })}`;
+        configDoc = 'project';
+      } else {
+        configData = `${VERSION_CONFIG}${createProjectConfig({ github })}${SITE_CONFIG}`;
+        configDoc = 'project and site';
+      }
+      session.log.info(
+        `💾 Writing new ${configDoc} config file: ${chalk.blue(path.resolve(configFile))}`,
+      );
+      fs.writeFileSync(configFile, configData);
+    }
   }
   if (writeTOC) {
     await loadConfig(session, '.');

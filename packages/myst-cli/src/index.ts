@@ -1,6 +1,7 @@
 export * from './build/index.js';
 export * from './cli/index.js';
 export * from './config.js';
+export * from './init/index.js';
 export * from './frontmatter.js';
 export * from './plugins.js';
 export * from './process/index.js';
