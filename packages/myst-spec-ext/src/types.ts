@@ -99,6 +99,7 @@ export type TabItem = Parent & {
 export type Heading = SpecHeading & {
   html_id?: string;
   implicit?: true;
+  depthSource?: number;
 };
 
 export type Image = SpecImage & {

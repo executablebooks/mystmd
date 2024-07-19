@@ -7,6 +7,7 @@ import {
   validateString,
   validationError,
   validateBoolean,
+  validateNumber,
 } from 'simple-validators';
 import { validateProjectAndPageFrontmatterKeys } from '../project/validators.js';
 import { PAGE_FRONTMATTER_KEYS, PAGE_KNOWN_PARTS, type PageFrontmatter } from './types.js';
@@ -81,11 +82,21 @@ export function validatePageFrontmatterKeys(value: Record<string, any>, opts: Va
       output.parts = Object.fromEntries(partsEntries);
     }
   }
+  if (defined(value.enumerator)) {
+    output.enumerator = validateString(value.enumerator, incrementOptions('enumerator', opts));
+  }
   if (defined(value.content_includes_title)) {
     output.content_includes_title = validateBoolean(
       value.content_includes_title,
       incrementOptions('content_includes_title', opts),
     );
+  }
+  if (defined(value.titleDepth)) {
+    output.titleDepth = validateNumber(value.titleDepth, {
+      integer: true,
+      min: 0,
+      ...incrementOptions('titleDepth', opts),
+    });
   }
   return output;
 }

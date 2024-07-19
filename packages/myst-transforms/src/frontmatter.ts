@@ -91,6 +91,7 @@ export function getFrontmatter(
     if (frontmatter.title && frontmatter.title === title && !opts.keepTitleNode) {
       (nextNode as any).type = '__delete__';
       frontmatter.content_includes_title = false;
+      frontmatter.titleDepth = nextNode.depth;
       // If this has a label add it to the page identifiers for reference resolution
       if (nextNode.label) {
         const { identifier } = normalizeLabel(nextNode.label) ?? {};

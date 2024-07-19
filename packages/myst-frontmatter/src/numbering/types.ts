@@ -2,10 +2,11 @@ export type NumberingItem = {
   enabled?: boolean;
   start?: number;
   template?: string;
+  continue?: boolean;
 };
 
 export type Numbering = {
-  enumerator?: NumberingItem; // start ignored
+  enumerator?: NumberingItem; // start, enabled, and continue ignored
   all?: NumberingItem; // start and template ignored
   figure?: NumberingItem;
   subfigure?: NumberingItem;
@@ -13,6 +14,7 @@ export type Numbering = {
   subequation?: NumberingItem;
   table?: NumberingItem;
   code?: NumberingItem;
+  title?: NumberingItem;
   heading_1?: NumberingItem;
   heading_2?: NumberingItem;
   heading_3?: NumberingItem;

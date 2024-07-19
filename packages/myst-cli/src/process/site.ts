@@ -6,8 +6,11 @@ import { writeFileToFolder, tic, hashAndCopyStaticFile } from 'myst-cli-utils';
 import { RuleId, toText, plural } from 'myst-common';
 import type { SiteConfig, SiteProject } from 'myst-config';
 import type { Node } from 'myst-spec';
-import type { LinkTransformer, MystXRefs, ReferenceState } from 'myst-transforms';
-import { select } from 'unist-util-select';
+import type { Heading } from 'myst-spec-ext';
+import { enumerateTargetsTransform, ReferenceState } from 'myst-transforms';
+import type { TargetCounts, LinkTransformer, MystXRefs } from 'myst-transforms';
+import { select, selectAll } from 'unist-util-select';
+import { VFile } from 'vfile';
 import { reloadAllConfigsForCurrentSite } from '../config.js';
 import type { SiteManifestOptions } from '../build/site/manifest.js';
 import {
@@ -24,6 +27,7 @@ import type { ISession } from '../session/types.js';
 import { selectors } from '../store/index.js';
 import { watch } from '../store/reducers.js';
 import { addWarningForFile } from '../utils/addWarningForFile.js';
+import { logMessagesFromVFile } from '../utils/logging.js';
 import { ImageExtensions } from '../utils/resolveExtension.js';
 import version from '../version.js';
 import { combineProjectCitationRenderers } from './citations.js';
@@ -239,11 +243,42 @@ export function selectPageReferenceStates(
   opts?: { suppressWarnings?: boolean },
 ) {
   const cache = castSession(session);
+  const headingDepths = new Set(
+    pages
+      .map(({ file }) => {
+        const { mdast } = cache.$getMdast(file)?.post ?? {};
+        const headingNodes = selectAll('heading', mdast).filter(
+          (node) => (node as Heading).enumerated !== false,
+        );
+        return headingNodes.map((node) => (node as Heading).depthSource ?? (node as Heading).depth);
+      })
+      .flat(),
+  );
+  let previousCounts: TargetCounts | undefined;
   const pageReferenceStates: ReferenceState[] = pages
-    .map((page) => {
-      const state = cache.$internalReferences[page.file];
+    .map(({ file }) => {
+      const { frontmatter, identifiers, mdast } = cache.$getMdast(file)?.post ?? {};
+      const vfile = new VFile();
+      vfile.path = file;
+      const state = new ReferenceState(file, {
+        frontmatter,
+        identifiers,
+        headingDepths,
+        previousCounts,
+        vfile,
+      });
+      if (frontmatter && !frontmatter.enumerator) {
+        frontmatter.enumerator = state.enumerator;
+      }
+      if (frontmatter && frontmatter.enumerator) {
+        // It would be better to handle enumerator at the theme / template level rather than baking into title
+        frontmatter.title = `${frontmatter.enumerator}${frontmatter.title ? ` ${frontmatter.title}` : ''}`;
+      }
+      if (mdast) enumerateTargetsTransform(mdast, { state });
+      previousCounts = state.targetCounts;
+      logMessagesFromVFile(session, vfile);
       if (state) {
-        const selectedFile = selectors.selectFileInfo(session.store.getState(), page.file);
+        const selectedFile = selectors.selectFileInfo(session.store.getState(), file);
         if (selectedFile?.url) state.url = selectedFile.url;
         if (selectedFile?.title) state.title = selectedFile.title;
         if (selectedFile?.dataUrl) state.dataUrl = selectedFile.dataUrl;
@@ -342,11 +377,15 @@ export async function fastProcessFile(
     execute,
   });
   const pageReferenceStates = selectPageReferenceStates(session, pages);
-  await postProcessMdast(session, {
-    file,
-    pageReferenceStates,
-    extraLinkTransformers,
-  });
+  await Promise.all(
+    pages.map(async (page) => {
+      return postProcessMdast(session, {
+        file: page.file,
+        pageReferenceStates,
+        extraLinkTransformers,
+      });
+    }),
+  );
   const { mdast, frontmatter } = castSession(session).$getMdast(file)?.post ?? {};
   if (mdast && frontmatter) {
     await finalizeMdast(session, mdast, frontmatter, file, {
@@ -358,7 +397,16 @@ export async function fastProcessFile(
       maxSizeWebp,
     });
   }
-  await writeFile(session, { file, pageSlug, projectSlug, projectPath });
+  await Promise.all(
+    pages.map(async (page) => {
+      return writeFile(session, {
+        file: page.file,
+        projectSlug,
+        projectPath,
+        pageSlug: page.slug,
+      });
+    }),
+  );
   session.log.info(toc(`📖 Built ${file} in %s.`));
   await writeSiteManifest(session, { defaultTemplate });
 }

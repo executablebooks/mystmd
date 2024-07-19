@@ -48,6 +48,7 @@ export async function headingDepthTransform(
     const depthIndex = currentDepths.indexOf(heading.depth);
     if (depthIndex < 0) return;
     const newDepth = depthIndex + firstDepth;
+    heading.depthSource = heading.depth;
     heading.depth = newDepth < 7 ? newDepth : 6;
   });
 }

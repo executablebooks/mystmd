@@ -4,18 +4,16 @@ import type { GenericParent, IExpressionResult, PluginUtils, References } from '
 import { fileError, fileWarn, RuleId } from 'myst-common';
 import type { PageFrontmatter } from 'myst-frontmatter';
 import { SourceFileKind } from 'myst-spec-ext';
-import type { LinkTransformer } from 'myst-transforms';
+import type { LinkTransformer, ReferenceState } from 'myst-transforms';
 import {
   basicTransformationsPlugin,
   htmlPlugin,
   footnotesPlugin,
-  ReferenceState,
   MultiPageReferenceResolver,
   resolveLinksAndCitationsTransform,
   resolveReferencesTransform,
   mathPlugin,
   codePlugin,
-  enumerateTargetsPlugin,
   keysTransform,
   linksTransform,
   MystTransformer,
@@ -162,8 +160,6 @@ export async function transformMdast(
   const references: References = {
     cite: { order: [], data: {} },
   };
-  const state = new ReferenceState(file, { numbering: frontmatter.numbering, identifiers, vfile });
-  cache.$internalReferences[file] = state;
   // Import additional content from mdast or other files
   frontmatterPartsTransform(session, file, mdast, frontmatter);
   importMdastFromJson(session, file, mdast);
@@ -181,15 +177,17 @@ export async function transformMdast(
     })
     .use(inlineMathSimplificationPlugin)
     .use(mathPlugin, { macros: frontmatter.math })
-    .use(glossaryPlugin) // This should be before the enumerate plugins
-    .use(abbreviationPlugin, { abbreviations: frontmatter.abbreviations })
-    .use(enumerateTargetsPlugin, { state }) // This should be after math/container transforms
     .use(joinGatesPlugin);
   // Load custom transform plugins
   session.plugins?.transforms.forEach((t) => {
     if (t.stage !== 'document') return;
     pipe.use(t.plugin, undefined, pluginUtils);
   });
+
+  pipe
+    .use(glossaryPlugin) // This should be before the enumerate plugins
+    .use(abbreviationPlugin, { abbreviations: frontmatter.abbreviations });
+
   await pipe.run(mdast, vfile);
 
   // This needs to come after basic transformations since meta tags are added there
@@ -278,7 +276,7 @@ export async function postProcessMdast(
   }: {
     file: string;
     checkLinks?: boolean;
-    pageReferenceStates?: ReferenceState[];
+    pageReferenceStates: ReferenceState[];
     extraLinkTransformers?: LinkTransformer[];
   },
 ) {
@@ -290,10 +288,7 @@ export async function postProcessMdast(
   const vfile = new VFile(); // Collect errors on this file
   vfile.path = file;
   const { mdast, dependencies, frontmatter } = mdastPost;
-  const fileState = cache.$internalReferences[file];
-  const state = pageReferenceStates
-    ? new MultiPageReferenceResolver(pageReferenceStates, file, vfile)
-    : fileState;
+  const state = new MultiPageReferenceResolver(pageReferenceStates, file, vfile);
   const externalReferences = Object.values(cache.$externalReferences);
   // NOTE: This is doing things in place, we should potentially make this a different state?
   const transformers = [
@@ -308,12 +303,12 @@ export async function postProcessMdast(
     new StaticFileTransformer(session, file), // Links static files and internally linked files
   ];
   resolveLinksAndCitationsTransform(mdast, { state, transformers });
-  linksTransform(mdast, state.vfile as VFile, {
+  linksTransform(mdast, vfile, {
     transformers,
     selector: LINKS_SELECTOR,
   });
   await transformLinkedRORs(session, vfile, mdast, file);
-  resolveReferencesTransform(mdast, state.vfile as VFile, { state, transformers });
+  resolveReferencesTransform(mdast, vfile, { state, transformers });
   await transformMystXRefs(session, vfile, mdast, frontmatter);
   await embedTransform(session, mdast, file, dependencies, state);
   const pipe = unified();
@@ -326,7 +321,6 @@ export async function postProcessMdast(
   // Ensure there are keys on every node after post processing
   keysTransform(mdast);
   checkLinkTextTransform(mdast, externalReferences, vfile);
-  logMessagesFromVFile(session, fileState.vfile);
   logMessagesFromVFile(session, vfile);
   log.debug(toc(`Transformed mdast cross references and links for "${file}" in %s`));
   if (checkLinks) await checkLinksTransform(session, file, mdast);

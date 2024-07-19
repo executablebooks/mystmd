@@ -23,7 +23,7 @@ describe('enumerateTargets', () => {
   test.each(cases.map((c): [string, TestCase] => [c.title, c]))(
     '%s',
     (_, { before, after, opts }) => {
-      const state = new ReferenceState('my-file.md', opts);
+      const state = new ReferenceState('my-file.md', { frontmatter: opts });
       const transformed = enumerateTargetsTransform(before, { state });
       expect(yaml.dump(transformed)).toEqual(yaml.dump(after));
     },

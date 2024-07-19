@@ -21,7 +21,9 @@ export const PAGE_FRONTMATTER_KEYS = [
   'jupytext',
   'tags',
   'parts',
+  'enumerator',
   'content_includes_title',
+  'titleDepth',
   ...PAGE_KNOWN_PARTS,
 ];
 
@@ -31,9 +33,11 @@ export type PageFrontmatter = ProjectAndPageFrontmatter & {
   jupytext?: Jupytext;
   tags?: string[];
   parts?: Record<string, string[]>;
+  enumerator?: string;
   /** Flag if frontmatter title is duplicated in content
    *
    * Set during initial file/frontmatter load
    */
   content_includes_title?: boolean;
+  titleDepth?: number;
 };

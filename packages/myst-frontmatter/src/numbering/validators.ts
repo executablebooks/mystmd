@@ -24,7 +24,7 @@ export const NUMBERING_KEYS = [
   ...HEADING_KEYS,
 ];
 
-const NUMBERING_ITEM_KEYS = ['enabled', 'start', 'template'];
+const NUMBERING_ITEM_KEYS = ['enabled', 'start', 'template', 'continue'];
 
 export const NUMBERING_ALIAS = {
   sections: 'headings',
@@ -40,6 +40,11 @@ export const NUMBERING_ALIAS = {
   heading4: 'heading_4',
   heading5: 'heading_5',
   heading6: 'heading_6',
+  figures: 'figure',
+  subfigures: 'subfigure',
+  equations: 'equation',
+  subequations: 'subequation',
+  tables: 'table',
 };
 
 function isBoolean(input: any) {
@@ -96,6 +101,13 @@ export function validateNumberingItem(
       output.enabled = output.enabled ?? true;
     }
   }
+  if (defined(value.continue)) {
+    const cont = validateBoolean(value.continue, incrementOptions('continue', opts));
+    if (defined(cont)) {
+      output.continue = cont;
+      output.enabled = output.enabled ?? true;
+    }
+  }
   if (Object.keys(output).length === 0) return undefined;
   return output;
 }
@@ -127,6 +139,10 @@ export function validateNumbering(input: any, opts: ValidationOptions): Numberin
     if (output.enumerator?.start != null) {
       validationWarning("value for 'start' is ignored", enumeratorOpts);
       delete output.enumerator.start;
+    }
+    if (output.enumerator?.continue != null) {
+      validationWarning("value for 'continue' is ignored", enumeratorOpts);
+      delete output.enumerator.continue;
     }
   }
   if (defined(value.all)) {
@@ -174,7 +190,11 @@ export function fillNumbering(base?: Numbering, filler?: Numbering) {
       output[key] = fillMissingKeys(
         base?.[key] ?? {},
         // Enabling/disabling all in base overrides filler
-        { ...val, enabled: base?.all?.enabled ?? val.enabled },
+        {
+          ...val,
+          enabled: base?.all?.enabled ?? val.enabled,
+          continue: base?.all?.continue ?? val.continue,
+        },
         NUMBERING_ITEM_KEYS,
       );
     });

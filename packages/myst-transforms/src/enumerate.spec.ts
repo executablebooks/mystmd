@@ -50,7 +50,7 @@ describe('enumeration', () => {
       ]),
     ]);
     const state = new ReferenceState('my-file.md', {
-      numbering: { enumerator: { template: 'A.%s' } },
+      frontmatter: { numbering: { enumerator: { template: 'A.%s' } } },
     });
     enumerateTargetsTransform(tree, { state });
     expect(state.getTarget('eq:1')?.node.enumerator).toBe('A.1');
@@ -71,7 +71,7 @@ describe('enumeration', () => {
       u('heading', { identifier: 'h3', depth: 1 }),
     ]);
     const state = new ReferenceState('my-file.md', {
-      numbering: { heading_1: { enabled: true }, heading_2: { enabled: true } },
+      frontmatter: { numbering: { heading_1: { enabled: true }, heading_2: { enabled: true } } },
     });
     enumerateTargetsTransform(tree, { state });
     expect(state.getTarget('h1')?.node.enumerator).toBe('1');
@@ -88,7 +88,7 @@ describe('enumeration', () => {
       u('container', { identifier: 'fig:2', kind: 'figure' }, []),
     ]);
     const state = new ReferenceState('my-file.md', {
-      numbering: { enumerator: { template: 'A.%s' } },
+      frontmatter: { numbering: { enumerator: { template: 'A.%s' } } },
     });
     enumerateTargetsTransform(tree, { state });
     expect(state.getTarget('fig:1')?.node.enumerator).toBe('A.1');
@@ -136,7 +136,7 @@ describe('initializeTargetCounts', () => {
         { type: 'heading', depth: 4, children: [] },
       ],
     };
-    expect(initializeTargetCounts({}, undefined, tree)).toEqual({
+    expect(initializeTargetCounts({}, undefined, undefined, tree)).toEqual({
       heading: [0, null, 0, 0, null, null],
     });
   });
@@ -154,7 +154,9 @@ describe('initializeTargetCounts', () => {
         { type: 'heading', depth: 4, children: [] },
       ],
     };
-    expect(initializeTargetCounts({}, initialCounts as any, tree)).toEqual(initialCounts);
+    expect(initializeTargetCounts({}, initialCounts as any, undefined, tree)).toEqual(
+      initialCounts,
+    );
   });
   test('explicit numberings override initialCounts', () => {
     const initialCounts = {
