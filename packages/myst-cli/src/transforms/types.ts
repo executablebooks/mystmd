@@ -10,6 +10,7 @@ export type PreRendererData = {
   kind: SourceFileKind;
   frontmatter?: PageFrontmatter;
   identifiers?: string[];
+  widgets?: Record<string, any>;
 };
 
 export type RendererData = PreRendererData & {

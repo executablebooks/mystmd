@@ -7,6 +7,7 @@ import type {
   ICell,
   IMimeBundle,
   INotebookContent,
+  INotebookMetadata,
   IOutput,
   MultilineString,
 } from '@jupyterlab/nbformat';
@@ -87,7 +88,7 @@ export async function processNotebookFull(
   session: ISession,
   file: string,
   content: string,
-): Promise<{ mdast: GenericParent; frontmatter: PageFrontmatter }> {
+): Promise<{ mdast: GenericParent; frontmatter: PageFrontmatter; widgets: Record<string, any> }> {
   const { log } = session;
   const { metadata, cells } = JSON.parse(content) as INotebookContent;
   // notebook will be empty, use generateNotebookChildren, generateNotebookOrder here if we want to populate those
@@ -110,6 +111,10 @@ export async function processNotebookFull(
     filteredMetadata ?? {},
     frontmatterValidationOpts(vfile),
   );
+
+  // Load widgets from notebook metadata
+  // TODO validation / sanitation
+  const widgets = (metadata?.widgets ?? {}) as Record<string, any>;
 
   let end = cells.length;
   if (cells && cells.length > 1 && cells?.[cells.length - 1].source.length === 0) {
@@ -180,5 +185,5 @@ export async function processNotebookFull(
   logMessagesFromVFile(session, vfile);
 
   const mdast = { type: 'root', children: items };
-  return { mdast, frontmatter };
+  return { mdast, frontmatter, widgets };
 }
