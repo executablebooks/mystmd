@@ -55,6 +55,7 @@ export type AllOptions = {
     tasklist?: boolean;
     tables?: boolean;
     blocks?: boolean;
+    strikethrough?: boolean;
   };
   mdast: MdastOptions;
   directives: DirectiveSpec[];

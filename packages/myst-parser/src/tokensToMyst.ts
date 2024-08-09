@@ -91,6 +91,7 @@ const defaultMdast: Record<string, TokenHandlerSpec> = {
       };
     },
   },
+  s: { type: 'delete' },
   hr: {
     type: 'thematicBreak',
     noCloseToken: true,
