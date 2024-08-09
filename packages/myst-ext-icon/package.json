@@ -1,0 +1,40 @@
+{
+  "name": "myst-ext-icon",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "license": "MIT",
+  "description": "MyST extension for icon roles",
+  "author": "Angus Hollands <goosey15@gmail.com>",
+  "homepage": "https://github.com/jupyter-book/mystmd/tree/main/packages/myst-ext-icon",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jupyter-book/mystmd.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "lint": "eslint \"src/**/!(*.spec).ts\" -c ./.eslintrc.cjs",
+    "lint:format": "npx prettier --check \"src/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "build:esm": "tsc",
+    "build": "npm-run-all -l clean -p build:esm"
+  },
+  "bugs": {
+    "url": "https://github.com/jupyter-book/mystmd/issues"
+  },
+  "dependencies": {
+    "myst-common": "^1.5.1"
+  },
+  "devDependencies": {
+    "myst-parser": "^1.5.1"
+  }
+}

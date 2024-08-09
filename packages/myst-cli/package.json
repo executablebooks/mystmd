@@ -75,6 +75,7 @@
     "myst-ext-card": "^1.0.7",
     "myst-ext-exercise": "^1.0.7",
     "myst-ext-grid": "^1.0.7",
+    "myst-ext-icon": "^0.0.0",
     "myst-ext-proof": "^1.0.10",
     "myst-ext-reactive": "^1.0.7",
     "myst-ext-tabs": "^1.0.7",
