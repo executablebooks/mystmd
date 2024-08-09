@@ -246,14 +246,14 @@ describe('validateDate', () => {
     '2021 December 14',
     '12/14/2021',
     '12-14-2021',
-    '2022/12/14',
-    '2022-12-14',
+    '2021/12/14',
+    '2021-12-14',
   ])('valid date: %p', async (date: any) => {
-    expect(validateDate(date, opts)).toEqual(date);
+    expect(validateDate(date, opts)).toEqual('2021-12-14');
   });
   it('date object is valid', () => {
-    const date = new Date();
-    expect(validateDate(date, opts)).toEqual(date.toISOString());
+    const date = new Date('2024-11-03');
+    expect(validateDate(date, opts)).toEqual('2024-11-03');
   });
   it('invalid date errors', () => {
     expect(validateDate('https://example.com', opts)).toEqual(undefined);

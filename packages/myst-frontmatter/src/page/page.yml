@@ -40,7 +40,7 @@ cases:
         a: b
       subtitle: sub
       short_title: short
-      date: 14 Dec 2021
+      date: '14 Dec 2021'
       kernelspec: {}
       jupytext: {}
       keywords:
@@ -84,7 +84,7 @@ cases:
           macro: b
       subtitle: sub
       short_title: short
-      date: 14 Dec 2021
+      date: '2021-12-14'
       kernelspec: {}
       jupytext: {}
       keywords:

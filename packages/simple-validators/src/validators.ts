@@ -222,7 +222,7 @@ export function validateDate(input: any, opts: ValidationOptions) {
       opts,
     );
   }
-  return typeof input === 'string' ? input : formatDate(date);
+  return formatDate(date);
 }
 
 /**

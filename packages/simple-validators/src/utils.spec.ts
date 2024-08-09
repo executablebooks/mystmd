@@ -3,9 +3,9 @@ import moment from 'moment';
 import { formatDate } from './utils';
 
 describe('formatDate', () => {
-  it('returns an ISO string', () => {
+  it('returns an ISO date string', () => {
     expect(formatDate(moment.utc('2020-06-01 10:10:30').toDate())).toEqual(
-      expect.stringMatching('2020-06-01T10:10:30.000Z'),
+      expect.stringMatching('2020-06-01'),
     );
   });
 });

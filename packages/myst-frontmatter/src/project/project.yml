@@ -27,7 +27,7 @@ cases:
       affiliations:
         - id: univa
           name: University A
-      date: 14 Dec 2021
+      date: '14 Dec 2021'
       doi: 10.1000/abcd/efg012
       arxiv: https://arxiv.org/example
       open_access: true
@@ -76,7 +76,7 @@ cases:
       affiliations:
         - id: univa
           name: University A
-      date: 14 Dec 2021
+      date: '2021-12-14'
       doi: 10.1000/abcd/efg012
       arxiv: https://arxiv.org/example
       open_access: true

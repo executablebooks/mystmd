@@ -94,9 +94,9 @@ export function extendFrontmatter(frontmatter: PageFrontmatter): RendererDoc {
   const doc: RendererDoc = {
     ...frontmatter,
     date: {
-      day: String(datetime.getUTCDate()),
-      month: String(datetime.getUTCMonth() + 1),
-      year: String(datetime.getUTCFullYear()),
+      day: String(datetime.getDate()),
+      month: String(datetime.getMonth() + 1),
+      year: String(datetime.getFullYear()),
     },
     authors: addIndicesToAuthors(frontmatter.authors || [], affiliations, collaborations),
     affiliations,

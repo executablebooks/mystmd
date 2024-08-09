@@ -14,12 +14,21 @@ export function getDate(object: undefined | Date | string | { toDate: () => Date
   throw new Error(`Could not parse date: ${object}`);
 }
 
+function formatISODateString(date: Date): string {
+  const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
+  // Format the date as a machine-readable date
+  const isoString = utcDate.toISOString();
+  const match = isoString.match(/^\d+-\d+-\d+/);
+  return match![0];
+}
+
 export function formatDate(date: Date | { toDate: () => Date }): string {
   if (date instanceof Date) {
-    return date.toISOString();
+    return formatISODateString(date);
   }
   if (date?.toDate !== undefined) {
-    return date.toDate().toISOString();
+    return formatISODateString(date.toDate());
   }
   if (typeof date === 'string') {
     return formatDate(getDate(date));
